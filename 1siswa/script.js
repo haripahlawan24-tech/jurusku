@@ -382,6 +382,25 @@ function startRealtimeRefresh() {
 
             await loadDatabase();
             
+            // ==========================================
+            // TAMBAHKAN LOGIKA AUTO-LOGOUT DI SINI
+            // ==========================================
+            let savedPass = localStorage.getItem("jurusku_pass");
+            
+            // Cek apakah user dihapus admin ATAU password di database tidak sama dengan di penyimpanan lokal
+            if (!usersData[currentUser] || usersData[currentUser].password !== savedPass) {
+                showToast("⚠️ Sesi berakhir! Username atau Password telah diubah oleh Admin.");
+                clearInterval(pollingInterval); // Hentikan refresh
+                
+                // Tunggu 2.5 detik agar pesan terbaca, lalu paksa logout
+                setTimeout(() => {
+                    logout(); 
+                }, 2500);
+                
+                return; // Batalkan proses render di bawahnya
+            }
+            // ==========================================
+
             // 2. Cegah render ulang UI 'monitor' JIKA user sedang mengetik
             if(document.getElementById('monitor').style.display === 'block' && !isTyping) {
                 loadKebiasaan();

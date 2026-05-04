@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JURUSKU - JUrnal RUtin Siswa & e-buKU</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1db954;
+            --primary-dark: #15803d;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #e8f5e9, #ffffff),
+                        radial-gradient(circle at bottom left, #f0fdf4, #ffffff);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            /* Efek Kedipan Terang */
+            animation: bgNyala 1.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes bgNyala { 
+            0% { background-color: #ffffff; } 
+            100% { background-color: #fff9e6; box-shadow: inset 0 0 100px rgba(253, 203, 110, 0.15); } 
+        }
+
+        .wrapper {
+            text-align: center;
+            z-index: 10;
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+
+        .main-logo {
+            width: 100px; /* Ukuran logo lebih proporsional */
+            margin-bottom: 20px;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.05));
+            animation: floating 4s ease-in-out infinite;
+        }
+
+        /* --- TYPOGRAPHY SECTION --- */
+        
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 4rem; /* Ukuran Dominan */
+            line-height: 1;
+            margin-bottom: 5px;
+            letter-spacing: -2px;
+            background: linear-gradient(90deg, #1db954, #00b894, #0984e3, #1db954);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: teksKilau 4s linear infinite;
+        }
+
+        .subtitle-main {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem; /* Ukuran Sedang */
+            color: var(--text-main);
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .school-name {
+            font-size: 0.85rem; /* Ukuran Kecil & Elegan */
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px; /* Jarak antar huruf agar terlihat luas */
+            margin-bottom: 40px;
+        }
+
+        /* --- BUTTON SECTION --- */
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 18px;
+            border-radius: 20px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.4rem;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(29, 185, 84, 0.3);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-main:active { transform: scale(0.96); }
+
+        .sub-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-small {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            color: var(--text-main);
+            padding: 14px;
+            border-radius: 18px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-small:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* --- ANIMATIONS --- */
+
+        @keyframes teksKilau { 
+            0% { background-position: 0% center; } 
+            100% { background-position: 200% center; } 
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .bg-blob {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--primary);
+            filter: blur(100px);
+            opacity: 0.08;
+            z-index: -1;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-blob"></div>
+
+    <div class="wrapper">
+        <img src="logo.png" alt="Logo Jurusku" class="main-logo">
+
+        <h1>JURUSKU</h1>
+        <h2 class="subtitle-main">JUrnal RUtin Siswa & e-buKU</h2>
+        <p class="school-name">SMP NEGERI 3 BABAT</p>
+
+        <div class="button-group">
+            <button onclick="location.href='1siswa/index.html'" class="btn-main">
+                🚀 MULAI
+            </button>
+
+            <div class="sub-buttons">
+                <button onclick="location.href='2guru/index.html'" class="btn-small">👨‍🏫 GURU</button>
+                <button onclick="location.href='3admin/index.html'" class="btn-small">⚙️ ADMIN</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

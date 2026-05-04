@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1db954">
+    <title>JURUSKU</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="toast">PESAN DI SINI</div>
+
+<div id="overlay"></div>
+<div id="confirmToast">
+    <div style="font-size: 4rem; margin-bottom: 5px; animation: fadeIn 0.5s ease;">🌙</div>
+    <p>Masih ada aktivitas yang kosong!<br>Yakin ingin tidur dan mengunci semuanya?</p>
+    <div class="confirm-buttons">
+        <button class="btn-ya" onclick="confirmSleep(true)">IYA</button>
+        <button class="btn-tidak" onclick="confirmSleep(false)">TIDAK</button>
+    </div>
+</div>
+
+<div id="examContainer" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:99999; background:#f8fafc;">
+    <iframe id="examFrame" src="" style="width:100%; height:100%; border:none;"></iframe>
+    <button onclick="closeExam()" style="position:fixed; bottom:25px; left:50%; transform:translateX(-50%); z-index:999999 !important; padding:12px 24px; background:var(--danger); color:white; font-weight:800; border-radius:20px; border:3px solid white; box-shadow:0 10px 25px rgba(0,0,0,0.3); cursor:pointer; font-family: inherit;">❌ TUTUP UJIAN</button>
+</div>
+
+<header>
+    <div style="font-family: 'Fredoka', sans-serif; font-size: 2.2rem; margin-bottom: 5px; text-shadow: 2px 2px 4px rgba(0,0,0,0.15);">🚀 JURUSKU</div>
+    <div style="font-size: 0.9rem; font-weight: 600; opacity: 0.95;">JUrnal RUtin Siswa dan e-buKU</div>
+</header>
+
+<div id="greetingBar">
+    Halo, <span id="greetName">Pengguna</span>! 👋
+</div>
+
+<div id="loginPage" class="page" style="display:none">
+    <div class="card center">
+        <span style="font-size: 4rem;">👋</span>
+        <h3>Selamat Datang</h3>
+        <input id="username" placeholder="Masukkan Username...">
+        
+        <div style="position: relative; display: flex; align-items: center; margin-top: 8px;">
+            <input type="password" id="password" placeholder="Masukkan Password..." style="margin-top: 0; padding-right: 40px; width: 100%;">
+            <span id="togglePassword" onclick="togglePass()" style="position: absolute; right: 12px; cursor: pointer; user-select: none; font-size: 1.2rem;">😴</span>
+        </div>
+
+        <button id="btnLogin" class="primary" onclick="login()">Masuk</button>
+        <p style="font-size: 0.75rem; color: #e74c3c; margin-top: 10px; font-weight:bold;">Tanya ke guru untuk mendapatkan username dan password / lupa Password</p>
+    </div>
+</div>
+
+
+<nav id="menu">
+    <button onclick="showPage('leaderboard')" id="btn-leaderboard">🏆<br>Top Skor</button>
+    <button onclick="showPage('dashboard')" id="btn-dashboard">📊<br>Progres</button>
+    <button onclick="showPage('monitor')" id="btn-monitor">✅<br>Jurnal</button>
+    <button onclick="showPage('ebuku')" id="btn-ebuku">📚<br>e-Buku</button>
+    <button onclick="showPage('setting')" id="btn-setting">⚙️<br>Profil</button>
+</nav>
+
+<div id="leaderboard" class="page">
+    <div class="lb-top-section">
+        <div class="lb-header">
+            <h2 style="font-size: 1.8rem; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">⭐⭐⭐</h2>
+            <h2>TOP SKOR</h2>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px;">
+				<button onclick="changeLbMonth(-1)" style="background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-weight: bold;">◀</button>
+				<div class="lb-header-sub" id="judulLeaderboardBulan" style="margin-bottom: 0;">BULAN INI</div>
+				<button onclick="changeLbMonth(1)" style="background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-weight: bold;">▶</button>
+			</div>
+            
+            <div class="lb-filter-container">
+                <button class="lb-filter-btn active" id="filter-global" onclick="setLbFilter('global')">GLOBAL</button>
+                <button class="lb-filter-btn" id="filter-regional" onclick="setLbFilter('regional')">REGIONAL</button>
+                <button class="lb-filter-btn" id="filter-kelas" onclick="setLbFilter('kelas')">KELAS</button>
+            </div>
+        </div>
+        <div id="lb-podium-container" class="lb-podium"></div>
+    </div>
+
+    <div class="lb-list-wrapper">
+        <div class="lb-list">
+            <div id="lb-list-container"></div>
+            <div class="lb-disclaimer" style="background:transparent; color:red; opacity:0.8;">-- Menampilkan 10 Besar Top Skor --</div>
+        </div>
+    </div>
+</div>
+
+<div id="dashboard" class="page">
+    <div class="card center">
+        <h3 id="tanggal" style="margin-top: 0;"></h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <select id="filterWaktu" onchange="updateView()" style="margin-top: 0;">
+                <option value="harian">Harian</option>
+                <option value="mingguan" selected>Mingguan (7 Hari)</option>
+                <option value="bulanan">Bulanan (30 Hari)</option>
+            </select>
+            <input type="date" id="filterTanggal" onchange="updateView()" style="display: none; margin-top: 0;">
+        </div>
+        <div style="position: relative; width: 100%; height: auto;"><canvas id="chart"></canvas></div>
+    </div>
+    <div class="evaluasi-box">
+        <h3 style="margin: 0 0 10px 0; font-size: 1.1rem;">📈 Evaluasi & Tips</h3>
+        <div id="evaluasiText">Memuat evaluasi...</div>
+    </div>
+    <div class="card" id="historyContainer" style="overflow-x: auto; padding-top: 10px;"></div>
+</div>
+
+<div id="monitor" class="page">
+    <div class="card center" style="border: 2px solid var(--primary);">
+        <div id="tanggalMonitor" style="font-weight:bold; color:var(--primary-dark)"></div>
+        <div style="font-size: 0.9rem; margin-top:5px">Poin Kamu Hari Ini:</div>
+        <div id="totalPoin" style="font-size: 2rem; font-weight:800; color:var(--primary)">0</div>
+    </div>
+    <div id="listKebiasaan"></div>
+</div>
+
+<div id="ebuku" class="page">
+    <div class="card center" style="border-top: 5px solid #9b59b6;">
+        <div style="font-size: 3.5rem; margin-bottom: 10px;">📚</div>
+        <h3 style="margin-top: 0; color: #9b59b6;">e-BUKU</h3>
+        <p style="font-size: 0.85rem; color: #64748b;">Akses modul pembelajaran dan buku elektronik untuk memperluas wawasanmu.</p>
+        
+        <button class="primary" style="background: #9b59b6;" onclick="window.location.href='https://haripahlawan24-tech.github.io/e-buku/'">Buka e-Buku 📖</button>
+        
+        </div>
+
+    <div class="card center" style="border-top: 5px solid #3498db;">
+        <div style="font-size: 3.5rem; margin-bottom: 10px;">📝</div>
+        <h3 style="margin-top: 0; color: #3498db;">e-ASESMEN</h3>
+        <p style="font-size: 0.85rem; color: #64748b;">Portal penilaian sumatif dan asesmen. Klik tombol di bawah ini untuk memulai.</p>
+        
+        <button class="primary" style="background: #3498db;" onclick="bukaDiChrome('https://haripahlawan24-tech.github.io/linke-asesmen/')">Siap Mulai 🚀</button>
+    </div>
+</div>
+
+<div id="setting" class="page">
+    <div class="card center">
+        <h3>⚙️ Profil</h3>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
+            <div id="profilAvatarDisplay" style="width: 80px; height: 80px; border-radius: 50%; background: #e2e8f0; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; margin-bottom: 10px; overflow: hidden; border: 3px solid var(--primary);">
+                🧑
+            </div>
+            <div class="badge" id="userLabel" style="font-size: 1rem;"></div>
+            <div style="font-size: 0.8rem; color: #64748b; margin-top: 5px;" id="usernameLabel"></div>
+        </div>
+        
+        <div style="text-align: left;">
+            <label style="font-size: 0.85rem; font-weight: bold; color: var(--text); display: block; margin-bottom: 8px;">Ubah Foto Profil:</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <label for="editAvatar" style="background: var(--primary); color: white; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight:bold; margin:0; box-sizing: border-box;">📸 Foto</label>
+                <input type="file" id="editAvatar" accept="image/*" style="display: none;" onchange="previewCrop(event)">
+                <button onclick="showAvatarModal()" style="background: #3498db; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight:bold;">🐱 Avatar</button>
+                <button onclick="showHapusModal()" style="background: var(--danger); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight:bold;">🗑️ Hapus</button>
+                <button onclick="batalUbahAvatar(true)" style="background: #cbd5e1; color: #475569; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight:bold;">❌ Batal</button>
+            </div>
+
+<label style="font-size: 0.85rem; font-weight: bold; color: var(--text); display: block; margin-top: 10px;">Nama Lengkap:</label>
+<input id="editNama" placeholder="Nama Lengkap..." readonly style="background-color: #e2e8f0; cursor: not-allowed; color: #64748b; border: 1px solid #cbd5e1;">
+
+<label style="font-size: 0.85rem; font-weight: bold; color: var(--text); display: block; margin-top: 10px;">Kelas:</label>
+<input id="editKelas" placeholder="Contoh: 7A" readonly style="background-color: #e2e8f0; cursor: not-allowed; color: #64748b; border: 1px solid #cbd5e1;">
+            
+            <label style="font-size: 0.85rem; font-weight: bold; color: var(--text); display: block; margin-top: 10px;">Ubah Password:</label>
+            <input type="text" id="editPassword" placeholder="Masukkan password baru jika ingin mengubahnya...">
+        </div>
+        
+        <button id="btnSimpanProfil" class="primary" style="margin-top: 15px;" onclick="simpanProfil()">Simpan</button>
+		<button class="primary" style="background: var(--danger); margin-top: 10px;" onclick="konfirmasiLogout()">Keluar</button>
+    </div>
+</div>
+
+<div id="cropModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:99999; flex-direction:column; align-items:center; justify-content:center;">
+    <div style="width: 90%; max-width: 400px; background: white; padding: 15px; border-radius: 12px; text-align: center;">
+        <h4 style="margin-top: 0; font-family: 'Fredoka', sans-serif;">Sesuaikan Foto</h4>
+        <div style="width: 100%; height: 300px; background: #e2e8f0; margin-bottom: 15px;">
+            <img id="imageToCrop" src="" style="max-width: 100%; display: block;">
+        </div>
+        <button onclick="saveCrop()" class="primary">Potong & Selesai</button>
+        <button onclick="cancelCrop()" class="primary" style="background: var(--danger); margin-top: 10px;">Batal Foto</button>
+    </div>
+</div>
+
+<div id="avatarModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; flex-direction:column; align-items:center; justify-content:center;">
+    <div style="background: white; padding: 20px; border-radius: 20px; text-align: center; width: 80%; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <h3 style="margin-top: 0; margin-bottom: 15px; font-family: 'Fredoka', sans-serif;">Pilih Avatar</h3>
+        <div id="emotContainer" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px;"></div>
+        <button onclick="document.getElementById('avatarModal').style.display='none'; document.body.style.overflow='auto';" style="width: 100%; background: #cbd5e1; color: #475569; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer;">Tutup</button>
+    </div>
+</div>
+
+<div id="hapusModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; flex-direction:column; align-items:center; justify-content:center;">
+    <div style="background: white; padding: 25px; border-radius: 20px; text-align: center; width: 80%; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🗑️</div>
+        <h3 style="margin: 0 0 10px 0; font-family: 'Fredoka', sans-serif;">Hapus Foto Profil?</h3>
+        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 20px;">Foto Anda akan dihapus sementara sebelum disimpan.</p>
+        <div style="display: flex; gap: 10px; justify-content: space-between;">
+            <button onclick="confirmHapusAvatar()" style="flex:1; background: var(--danger); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer;">YA</button>
+            <button onclick="document.getElementById('hapusModal').style.display='none'" style="flex:1; background: #cbd5e1; color: #475569; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer;">TIDAK</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

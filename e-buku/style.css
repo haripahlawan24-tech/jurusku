@@ -1,0 +1,243 @@
+:root {
+    --primary: #6c5ce7; 
+    --secondary: #00b894; 
+    --accent: #fdcb6e;
+    --buku-color: #0984e3; 
+    --video-color: #d63031; 
+    --game-color: #e17055;
+    --podcast-color: #9b59b6; 
+    --komik-color: #f39c12;
+    --bg-color: #f8f9fa; 
+    --text-dark: #2d3436; 
+    --card-bg: #ffffff;
+    --shadow: rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a2e; 
+    --text-dark: #e9e9eb; 
+    --card-bg: #16213e;
+    --shadow: rgba(0,0,0,0.3);
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Poppins', sans-serif; 
+    transition: background-color 0.3s, color 0.3s; 
+}
+
+body { 
+    background-color: var(--bg-color); 
+    color: var(--text-dark); 
+    overflow-x: hidden; 
+}
+
+/* Mengunci scroll saat splash tampil */
+body.no-scroll { overflow: hidden; }
+
+/* ================= SPLASH SCREEN ================= */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #7e6af2, #a29bfe); 
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.8s ease;
+}
+
+.splash-content {
+    text-align: center;
+    padding: 20px;
+    max-width: 600px;
+    animation: zoomInBounce 1s ease-out forwards; 
+}
+
+.splash-title { 
+    font-size: 3rem; 
+    margin-bottom: 20px; 
+    font-weight: 700;
+}
+
+.anim-wave {
+    display: inline-block;
+    animation: waveHand 2.5s infinite;
+    transform-origin: 70% 70%;
+}
+
+.splash-desc { 
+    font-size: 1.1rem; 
+    margin-bottom: 40px; 
+    line-height: 1.6; 
+}
+
+.btn-splash {
+    background-color: var(--accent); 
+    color: #2d3436;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(253, 203, 110, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-splash:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(253, 203, 110, 0.6);
+}
+
+.splash-hidden {
+    transform: translateY(-100vh); 
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ================= LAYOUT UTAMA (PENGUNCI FOOTER DI BAWAH) ================= */
+.main-app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Memastikan aplikasi minimal seukuran layar penuh */
+}
+
+/* Navbar */
+header { 
+    background-color: var(--card-bg); 
+    padding: 15px 5%; 
+    box-shadow: 0 4px 6px var(--shadow); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+}
+
+.logo { font-size: 24px; font-weight: 700; color: var(--primary); text-decoration: none; }
+.logo span { color: var(--secondary); }
+
+.btn-theme { 
+    background: none; 
+    border: 2px solid var(--primary); 
+    color: var(--primary); 
+    padding: 6px 12px; 
+    border-radius: 20px; 
+    cursor: pointer; 
+    font-weight: 600; 
+}
+
+.btn-mulai { background-color: var(--accent); color: #2d3436; padding: 12px 30px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(253, 203, 110, 0.4); }
+.btn-mulai:hover { transform: scale(1.05); }
+
+/* Search & Filter */
+.container-pencarian { 
+    text-align: center; 
+    padding: 30px 5% 10px 5%; 
+}
+
+.search-wrapper { position: relative; display: inline-block; width: 100%; max-width: 500px; }
+#search-input { width: 100%; padding: 15px 45px 15px 25px; border: 2px solid var(--accent); border-radius: 30px; background-color: var(--card-bg); color: var(--text-dark); box-shadow: 0 4px 10px var(--shadow); outline: none; font-size: 1rem; }
+.clear-btn { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1rem; opacity: 0.6; transition: opacity 0.3s; }
+.clear-btn:hover { opacity: 1; }
+
+.sapaan { text-align: center; margin-bottom: 20px; padding: 0 5%; font-size: 1.1rem; font-weight: 600; color: var(--secondary); }
+.filter-kategori { text-align: center; margin-bottom: 30px; padding: 0 5%; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+
+.btn-filter { padding: 8px 15px; border: none; border-radius: 20px; background-color: var(--card-bg); color: var(--text-dark); font-weight: 600; cursor: pointer; box-shadow: 0 2px 5px var(--shadow); transition: all 0.3s; }
+.btn-filter.aktif, .btn-filter:hover { background-color: var(--primary); color: white; transform: translateY(-3px); }
+
+/* Grid Item (Disesuaikan untuk mendorong footer ke bawah) */
+.rak-koleksi { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 25px; 
+    padding: 0 5%; 
+    margin-bottom: 60px; 
+    flex: 1; /* Mengisi sisa ruang layar kosong */
+    align-content: start; /* Menjaga agar ukuran kartu tidak melar ke bawah */
+}
+.kartu-item { background: var(--card-bg); border-radius: 20px; padding: 25px 20px; box-shadow: 0 10px 20px var(--shadow); text-align: center; transition: transform 0.3s; overflow-wrap: break-word; word-wrap: break-word;}
+.kartu-item:hover { transform: translateY(-10px); }
+
+/* Kumpulan Animasi */
+.ikon-item { font-size: 60px; margin-bottom: 10px; display: inline-block;}
+.anim-float { animation: floating 3s ease-in-out infinite; }
+.anim-pulse { animation: pulsing 2s infinite; }
+.anim-bounce { animation: bouncing 1.5s ease-in-out infinite; } 
+.anim-splash { animation: splashing 1.5s ease-in-out infinite alternate; }
+.kartu-item:hover .anim-wiggle { animation: wiggling 0.5s ease-in-out infinite; }
+
+.badge { font-size: 0.8rem; padding: 5px 12px; border-radius: 12px; font-weight: 600; display: inline-block; margin-bottom: 10px; color: white; }
+.badge-buku { background-color: var(--buku-color); }
+.badge-video { background-color: var(--video-color); }
+.badge-game { background-color: var(--game-color); }
+.badge-podcast { background-color: var(--podcast-color); } 
+.badge-komik { background-color: var(--komik-color); color: #2d3436; } 
+
+.kartu-item h3 { font-size: 1.2rem; color: var(--text-dark); margin-bottom: 10px; }
+.kartu-item p { font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px; }
+
+.btn-aksi { width: 100%; padding: 10px; border: none; border-radius: 15px; font-weight: 600; cursor: pointer; color: white; background-color: var(--secondary); transition: transform 0.2s; }
+.btn-aksi:hover { transform: scale(1.05); }
+
+/* Class Bantuan */
+.hidden { opacity: 0; transform: translateY(30px); transition: all 0.5s ease-out; }
+.show { opacity: 1; transform: translateY(0); }
+.d-none { display: none !important; }
+
+/* Modal Styles */
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
+.modal-content { background-color: var(--card-bg); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; animation: zoomIn 0.3s ease-out; position: relative; }
+.close-btn { position: absolute; top: 10px; right: 20px; font-size: 28px; cursor: pointer; color: var(--text-dark); }
+
+/* Pesan Kosong */
+.pesan-kosong { grid-column: 1 / -1; text-align: center; padding: 40px 20px; background-color: var(--card-bg); border-radius: 20px; box-shadow: 0 10px 20px var(--shadow); animation: zoomIn 0.3s ease-out; margin-top: 20px; }
+.ikon-kosong { font-size: 60px; margin-bottom: 15px; animation: floating 3s ease-in-out infinite; }
+.pesan-kosong h3 { color: var(--primary); font-size: 1.5rem; margin-bottom: 10px; }
+
+/* Keyframes Global */
+@keyframes zoomInBounce { 0% { opacity: 0; transform: scale(0.8); } 70% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes waveHand { 0% { transform: rotate(0deg); } 10% { transform: rotate(14deg); } 20% { transform: rotate(-8deg); } 30% { transform: rotate(14deg); } 40% { transform: rotate(-4deg); } 50% { transform: rotate(10deg); } 60% { transform: rotate(0deg); } 100% { transform: rotate(0deg); } }
+@keyframes floating { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+@keyframes pulsing { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+@keyframes bouncing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } } 
+@keyframes wiggling { 0% { transform: rotate(0deg); } 25% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } 75% { transform: rotate(-10deg); } 100% { transform: rotate(0deg); } }
+@keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes splashing { 0% { transform: scale(1) rotate(0deg); } 30% { transform: scale(1.15) rotate(-5deg); } 70% { transform: scale(1.15) rotate(5deg); } 100% { transform: scale(1) rotate(0deg); } }
+
+/* Footer Salim Ubaidillah */
+.footer-animasi { 
+    background: linear-gradient(135deg, var(--text-dark), #16213e); 
+    color: #ffffff; 
+    text-align: center; 
+    padding: 25px 20px; 
+    font-size: 1rem; 
+    position: relative; 
+    border-top-left-radius: 30px; 
+    border-top-right-radius: 30px; 
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.1); 
+    margin-top: auto; /* Ini kunci utamanya: Selalu mendorong footer ke bagian paling bawah! */
+}
+.lampu-nyala { display: inline-block; font-size: 1.4rem; margin: 0 5px; animation: nyalaTerang 1.5s infinite alternate ease-in-out; }
+.footer-animasi b { background: linear-gradient(90deg, #fdcb6e, #00b894, #0984e3, #fdcb6e); background-size: 200% auto; color: transparent; -webkit-background-clip: text; background-clip: text; animation: teksKilau 4s linear infinite; }
+@keyframes nyalaTerang { 0% { transform: scale(1) rotate(-15deg); filter: drop-shadow(0 0 2px #fdcb6e); } 100% { transform: scale(1.3) rotate(15deg); filter: drop-shadow(0 0 15px #fdcb6e) drop-shadow(0 0 25px #fdcb6e); } }
+@keyframes teksKilau { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+
+/* Mobile CSS */
+@media (max-width: 768px) { 
+    .splash-title { font-size: 2.2rem; }
+    .splash-desc { font-size: 1rem; padding: 0 10px; }
+    header { padding: 15px 20px; }
+    .btn-theme { font-size: 0.8rem; padding: 6px 10px; }
+    .rak-koleksi { padding: 0 20px; grid-template-columns: 1fr; gap: 20px;} 
+    .container-pencarian { padding: 20px 20px 10px 20px; }
+}

@@ -1,0 +1,146 @@
+:root {
+    --primary: #1db954;
+    --primary-dark: #15803d;
+    --toast-bg: #FFF380;
+    --danger: #e74c3c;
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text: #1e293b;
+}
+
+body { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    margin: 0; 
+    background-color: var(--bg); 
+    color: var(--text); 
+    padding-bottom: 80px; 
+    box-sizing: border-box; 
+    min-height: 100vh;
+    transition: background 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body:has(#leaderboard[style*="block"]) {
+    background: linear-gradient(180deg, #e74c3c 0%, #ff9800 50%, #ffc107 100%);
+    background-attachment: fixed;
+}
+
+body:has(#leaderboard[style*="block"]) header {
+    display: none;
+}
+
+header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 25px 20px; text-align: center; border-bottom-right-radius: 30px; border-bottom-left-radius: 30px; box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3); position: relative; z-index: 50; }
+
+/* Toast Biasa */
+#toast { visibility: hidden; min-width: 250px; background-color: var(--toast-bg); color: #333; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 2000; left: 50%; top: 30px; transform: translateX(-50%); font-weight: 600; font-size: 0.95rem; line-height: 1.4; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: 2px solid #ddd; }
+#toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+@keyframes fadein { from {top: 0; opacity: 0;} to {top: 30px; opacity: 1;} }
+@keyframes fadeout { from {top: 30px; opacity: 1;} to {top: 0; opacity: 0;} }
+
+/* Toast Konfirmasi & Overlay */
+#overlay { visibility: hidden; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2499; opacity: 0; transition: opacity 0.3s ease; }
+#overlay.show { visibility: visible; opacity: 1; }
+
+#confirmToast { visibility: hidden; background-color: var(--card-bg); color: var(--text); text-align: center; border-radius: 20px; padding: 30px 20px; position: fixed; z-index: 2500; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.9); box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 3px solid var(--primary); width: 85%; max-width: 320px; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
+#confirmToast.show { visibility: visible; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+#confirmToast p { font-size: 1rem; font-weight: 800; margin-top: 10px; margin-bottom: 25px; line-height: 1.5;}
+.confirm-buttons { display: flex; justify-content: space-between; gap: 10px; }
+.confirm-buttons button { flex: 1; padding: 14px; border: none; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: transform 0.1s; }
+.confirm-buttons button:active { transform: scale(0.95); }
+.btn-ya { background-color: var(--primary); color: white; }
+.btn-tidak { background-color: var(--danger); color: white; }
+
+/* NAV MENU - UPDATE UNTUK MEMBUAT TOMBOL PRESISI DI TENGAH */
+nav { position: fixed; bottom: 0; left: 0; right: 0; display: none; background: white; padding: 10px 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 1000; align-items: center; justify-content: space-between; }
+/* flex: 1; memastikan tiap tombol punya ukuran ruangan yang sama (masing-masing 20%), sehingga tombol ke-3 pasti pas di tengah */
+nav button { flex: 1; text-align: center; border: none; background: none; font-weight: 600; color: #b2bec3; font-size: 0.8rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: bottom center; padding: 5px 0;}
+nav button.active { color: var(--primary); transform: scale(1.15) translateY(-3px); font-weight: 800; }
+
+.page { display: none; padding: 20px; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1); }
+.primary { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 600; width: 100%; cursor: pointer; margin-top: 10px; transition: background 0.2s ease;}
+
+.primary.btn-disabled { background: #cbd5e1; color: #64748b; }
+textarea.locked-input { background-color: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; cursor: pointer; }
+
+input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; border: 2px solid #edf2f7; border-radius: 12px; box-sizing: border-box; font-family: inherit; }
+textarea { resize: vertical; min-height: 80px; } 
+input[type="file"] { padding: 10px; background: #f8fafc; cursor: pointer; }
+
+.badge { display: inline-block; padding: 4px 12px; background: #dcfce7; color: var(--primary-dark); border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-top: 10px; }
+.point-tag { float: right; background: #e1f5fe; color: #0288d1; padding: 2px 8px; border-radius: 8px; font-size: 0.75rem; }
+.center { text-align: center; }
+
+
+.shake { animation: shake 0.4s; }
+@keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 50% {transform: translateX(10px);} 75% {transform: translateX(-10px);} }
+
+.history-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+.history-table th, .history-table td { padding: 10px; border: 1px solid #edf2f7; text-align: left; vertical-align: top;}
+.history-table th { background-color: var(--primary); color: white; }
+.history-table tr:nth-child(even) { background-color: #f8fafc; }
+.detail-teks { font-size: 0.8rem; color: #475569; line-height: 1.5; }
+
+.evaluasi-box { background: #f0fdf4; border-left: 5px solid var(--primary); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+.evaluasi-box ul { margin: 5px 0 0 -20px; font-size: 0.9rem; color: #334155; }
+.evaluasi-box li { margin-bottom: 5px; }
+
+#greetingBar {
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text);
+    padding: 20px 20px 0 20px;
+    display: none; 
+}
+
+#leaderboard.page { padding: 0; background-color: transparent; }
+
+.lb-top-section { padding: 30px 15px 0px 15px; text-align: center; color: white; }
+.lb-header h2 { margin: 5px 0; font-size: 1.6rem; text-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+.lb-header-sub {
+    font-size: 1.1rem; /* Sedikit dikecilkan agar muat dengan tahun[cite: 3] */
+    font-weight: 700;
+    min-width: 150px; /* Memberi ruang konsisten untuk teks bulan & tahun[cite: 3] */
+    text-align: center;
+}
+.lb-filter-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 65px; } 
+.lb-filter-btn { background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0.8; }
+.lb-filter-btn.active { background: white; color: #e74c3c; transform: scale(1.15); opacity: 1; border-color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+
+.lb-podium { display: flex; align-items: flex-end; justify-content: center; gap: 12px; margin: 0 15px; }
+.lb-podium-item { flex: 1; background: white; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 5px; color: #334155; }
+.podium-1 { height: 160px; border: 3px solid #fbc531; z-index: 3; }
+.podium-2 { height: 135px; border: 3px solid #55efc4; z-index: 2; }
+.podium-3 { height: 115px; border: 3px solid #ffb8b8; z-index: 1; }
+.lb-avatar { position: absolute; top: 0; left: 50%; border-radius: 50%; background-color: #fff; display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
+.lb-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.podium-1 .lb-avatar { width: 85px; height: 85px; font-size: 3rem; border: 4px solid #fbc531; transform: translate(-50%, -60%); }
+.podium-2 .lb-avatar { width: 65px; height: 65px; font-size: 2rem; border: 3px solid #55efc4; transform: translate(-50%, -55%); }
+.podium-3 .lb-avatar { width: 55px; height: 55px; font-size: 1.5rem; border: 3px solid #ffb8b8; transform: translate(-50%, -55%); }
+.rank-badge { position: absolute; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.2); z-index: 10; }
+.podium-1 .rank-badge { width: 32px; height: 32px; font-size: 1.5rem; bottom: -5px; right: -5px; }
+.podium-2 .rank-badge { width: 24px; height: 24px; font-size: 1.1rem; bottom: -5px; right: -5px; }
+.podium-3 .rank-badge { width: 22px; height: 22px; font-size: 1rem; bottom: -5px; right: -5px; }
+.lb-podium-name { font-size: 0.75rem; font-weight: 800; word-wrap: break-word; text-transform: uppercase; margin-top: auto; line-height: 1.2; padding: 0 2px;}
+.lb-podium-kelas { font-size: 0.65rem; color: #94a3b8; font-weight: bold; margin-top: 3px;}
+.lb-podium-score { font-size: 1.3rem; font-weight: 900; color: var(--primary); margin-top: 5px; }
+
+.lb-list-wrapper { margin: 10px 15px 100px 15px; position: relative; z-index: 10; }
+.lb-list { background: white; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); overflow: hidden;}
+.lb-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #f1f5f9; }
+.lb-item:last-child { border-bottom: none; }
+.lb-item-num { width: 35px; font-weight: 800; color: #94a3b8; font-size: 1.1rem; text-align: center;}
+.lb-item-avatar { position: relative; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-right: 15px; background-color: #e2e8f0;}
+.lb-item-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.lb-item-info { flex: 1; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+.lb-item-name { font-weight: 800; font-size: 0.85rem; color: #334155; text-transform: uppercase; word-wrap: break-word; line-height: 1.2;}
+.lb-item-score { font-weight: 900; color: var(--primary); font-size: 1.1rem; margin-left: 10px;}
+.lb-disclaimer { text-align: center; font-size: 0.75rem; color: #94a3b8; padding: 15px; background: #f8fafc;}
+
+button[onclick^="changeLbMonth"]:active {
+    transform: scale(0.9);
+    background: rgba(255,255,255,0.4) !important;
+}

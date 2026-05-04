@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard Guru - JURUSKU</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #1db954;
+            --primary-dark: #15803d;
+            --danger: #e74c3c;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            box-sizing: border-box; 
+            min-height: 100vh;
+            transition: background 0.3s ease;
+        }
+
+        /* --- KODE BARU UNTUK BG OREN FULL DAN HIDE HEADER DI TOP SKOR --- */
+        body.lb-active {
+            background: linear-gradient(180deg, #e74c3c 0%, #ff9800 50%, #ffc107 100%) !important;
+            background-attachment: fixed !important;
+        }
+        body.lb-active header {
+            display: none !important;
+        }
+        body.lb-active .lb-top-section {
+            background: transparent !important;
+            box-shadow: none !important;
+            padding-top: 40px !important;
+        }
+        /* ---------------------------------------------------------------- */
+
+        header { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+            color: white; 
+            padding: 25px 20px; 
+            text-align: center; 
+            border-bottom-right-radius: 30px; 
+            border-bottom-left-radius: 30px; 
+            box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3); 
+        }
+
+        .container { padding: 20px; max-width: 1100px; margin: 0 auto; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1); }
+
+        .primary { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: inherit; }
+        .primary:hover { background: var(--primary-dark); }
+        .primary:disabled { background: #94a3b8; cursor: not-allowed; }
+        .btn-excel { background: #107c41; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        .btn-excel:hover { background: #0a5c30; }
+        .btn-refresh { background: #3b82f6; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;}
+
+        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 2px solid #edf2f7; border-radius: 12px; box-sizing: border-box; font-family: inherit; outline: none; }
+        input:focus, select:focus { border-color: var(--primary); }
+
+        .center { text-align: center; }
+
+        .table-responsive { overflow-x: auto; overflow-y: auto; max-height: 500px; border-radius: 12px; border: 1px solid #edf2f7; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 800px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f1f5f9; }
+        thead th { position: sticky; top: 0; background-color: #f8fafc; font-weight: 800; color: #64748b; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        tr:hover td { background-color: #f8fafc; }
+
+        .badge { padding: 6px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; display: inline-block; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef08a; color: #854d0e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+
+        #loginPage { max-width: 400px; margin: 10vh auto; }
+        .filters { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;}
+        .filters > div { flex: 1; min-width: 200px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .stat-box { display: flex; gap: 15px; margin-bottom: 20px; }
+        .stat-card { flex: 1; padding: 20px; border-radius: 15px; text-align: center; }
+        .stat-aktif { background: #dcfce7; }
+        .stat-aktif h3 { margin:0; color: #166534; font-size: 2.5rem; font-family: 'Fredoka', sans-serif; }
+        .stat-aktif p { margin:0; font-size: 0.85rem; color: #15803d; font-weight:800; }
+        .stat-poin { background: #e0f2fe; }
+        .stat-poin h3 { margin:0; color: #075985; font-size: 2.5rem; font-family: 'Fredoka', sans-serif; }
+        .stat-poin p { margin:0; font-size: 0.85rem; color: #0369a1; font-weight:800; }
+
+        .info-row { background: #f8fafc; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--primary); }
+        .info-label { font-size: 0.85rem; color: #64748b; font-weight: bold; }
+        .info-value { font-size: 0.95rem; font-weight: 600; color: #1e293b; margin-top: 3px; }
+        .date-divider { background: #e2e8f0; color: #475569; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; margin: 15px 0 15px 0; text-align: center;}
+
+        #menu { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 900; }
+        #menu button { flex: 1; padding: 12px; border: none; background: transparent; font-family: 'Fredoka', sans-serif; font-size: 0.95rem; color: #94a3b8; cursor: pointer; transition: 0.3s; }
+        #menu button.active { color: var(--primary); border-top: 3px solid var(--primary); background: #f0fdf4; }
+
+        .page { display: none; padding-bottom: 70px; } 
+        .page.active { display: block; animation: fadeIn 0.3s ease; }
+
+        /* ===============================================================
+           CSS TOP SKOR 
+           =============================================================== */
+        .lb-top-section { background: linear-gradient(180deg, #e74c3c 0%, #ff9800 50%, #ffc107 100%); padding: 30px 15px 0px 15px; text-align: center; color: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(234, 88, 12, 0.4);}
+        .lb-header h2 { margin: 5px 0; font-size: 1.6rem; text-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+        .lb-header-sub { font-size: 1.1rem; font-weight: 700; min-width: 150px; text-align: center; }
+        
+        .lb-filter-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 65px; margin-top: 15px; } 
+        .lb-filter-btn { background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0.8; }
+        .lb-filter-btn.active { background: white; color: #e74c3c; transform: scale(1.15); opacity: 1; border-color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+
+        .lb-podium { display: flex; align-items: flex-end; justify-content: center; gap: 12px; margin: 0 15px; }
+        .lb-podium-item { flex: 1; background: white; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 5px; color: #334155; }
+        .podium-1 { height: 160px; border: 3px solid #fbc531; z-index: 3; }
+        .podium-2 { height: 135px; border: 3px solid #55efc4; z-index: 2; }
+        .podium-3 { height: 115px; border: 3px solid #ffb8b8; z-index: 1; }
+        
+        .lb-avatar { position: absolute; top: 0; left: 50%; border-radius: 50%; background-color: #fff; display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
+        .lb-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        
+        .podium-1 .lb-avatar { width: 85px; height: 85px; font-size: 3rem; transform: translate(-50%, -60%); }
+        .podium-2 .lb-avatar { width: 65px; height: 65px; font-size: 2rem; transform: translate(-50%, -55%); }
+        .podium-3 .lb-avatar { width: 55px; height: 55px; font-size: 1.5rem; transform: translate(-50%, -55%); }
+        
+        .rank-badge { position: absolute; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.2); z-index: 10; font-weight: 900;}
+        .podium-1 .rank-badge { width: 32px; height: 32px; font-size: 1.3rem; bottom: -5px; right: -5px; }
+        .podium-2 .rank-badge { width: 26px; height: 26px; font-size: 1.1rem; bottom: -5px; right: -5px; }
+        .podium-3 .rank-badge { width: 24px; height: 24px; font-size: 1rem; bottom: -5px; right: -5px; }
+        
+        .lb-podium-name { font-size: 0.75rem; font-weight: 800; word-wrap: break-word; text-transform: uppercase; margin-top: auto; line-height: 1.2; padding: 0 2px; text-align: center;}
+        .lb-podium-kelas { font-size: 0.65rem; color: #94a3b8; font-weight: bold; margin-top: 3px; text-align: center;}
+        .lb-podium-score { font-weight: 900; color: var(--primary); margin-top: 5px; text-align: center;}
+
+        .lb-list-wrapper { margin: 15px 0 20px 0; position: relative; z-index: 10; }
+        .lb-list { background: white; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); overflow: hidden;}
+        .lb-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #f1f5f9; }
+        .lb-item:last-child { border-bottom: none; }
+        .lb-item-num { width: 35px; font-weight: 800; color: #94a3b8; font-size: 1.1rem; text-align: center;}
+        .lb-item-avatar { position: relative; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-right: 15px; background-color: #e2e8f0; }
+        .lb-item-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%;}
+        .lb-item-info { flex: 1; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+        .lb-item-name { font-weight: 800; font-size: 0.85rem; color: #334155; text-transform: uppercase; word-wrap: break-word; line-height: 1.2;}
+        .lb-item-score { font-weight: 900; color: var(--primary); font-size: 1.1rem; margin-left: 10px;}
+        .lb-disclaimer { text-align: center; font-size: 0.75rem; color: #94a3b8; padding: 15px; background: #f8fafc;}
+        /* =============================================================== */
+
+        #detailModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        #detailModal .modal-wrapper { background: white; width: 100%; max-width: 500px; max-height: 90vh; border-radius: 20px; position: relative; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden; animation: fadeIn 0.3s ease; }
+        #detailModal .close-btn { position: absolute; top: 15px; right: 15px; border: none; background: #f1f5f9; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; z-index: 10; font-weight: bold; color: #64748b; }
+        #detailModal .modal-header { padding: 30px 20px 10px; text-align: center; flex-shrink: 0; }
+        #detailModal .modal-content { padding: 0 20px 30px; overflow-y: auto; flex-grow: 1; scrollbar-width: thin; }
+        #detailModal .modal-content::-webkit-scrollbar { width: 6px; }
+        #detailModal .modal-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .modal-avatar-container { font-size: 3.5rem; margin-bottom: 10px; display: inline-block; }
+        #modalNama { margin:0; font-family: 'Fredoka', sans-serif; font-size: 1.5rem; color: #1e293b; }
+        #modalInfo { font-size: 0.9rem; color: #64748b; font-weight:bold; margin-top: 5px; }
+        #chartWrapper { margin-bottom: 20px; background: #fff; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0; display: none; }
+        .modal-nav { display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top: 10px; border-top: 2px dashed #e2e8f0; }
+
+        .btn-back-nav { background: #64748b; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; text-decoration: none; font-size: 0.9rem; }
+        .btn-back-nav:hover { background: #475569; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<div id="loginPage" class="container">
+    <div class="card center">
+        <span style="font-size: 4rem;">👨‍🏫</span>
+        <h2 style="font-family: 'Fredoka', sans-serif; margin-bottom: 5px;">Portal Guru</h2>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 0; margin-bottom: 20px;">Silakan masukkan kode akses guru.</p>
+        
+        <div style="position: relative; width: 100%; margin-top: 8px;">
+            <input type="password" id="kodeGuru" placeholder="Masukkan Kode Guru..." style="margin-top: 0; padding-right: 45px; width: 100%;">
+            <span id="toggleIcon" onclick="togglePassword()" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.2rem; user-select: none;">👁️</span>
+        </div>
+        
+        <button class="primary" style="width: 100%; margin-top: 15px;" onclick="loginGuru()">Masuk Dashboard</button>
+        
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #e2e8f0;">
+        <button onclick="window.location.href='../index.html'" style="width: 100%; background: #94a3b8; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer;">
+            🏠 Kembali ke Beranda
+        </button>
+    </div>
+</div>
+
+<div id="mainApp" style="display: none;">
+    <header>
+        <div style="font-family: 'Fredoka', sans-serif; font-size: 2.2rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.15);">🚀 JURUSKU</div>
+        <div id="headerDateRange" style="font-size: 0.9rem; font-weight: 600; opacity: 0.95; margin-top: 5px;">Dashboard Pemantauan Laporan Siswa</div>
+    </header>
+
+    <div id="dashboard" class="page active">
+        <div class="container">
+            <button class="btn-back-nav" onclick="window.location.href='../index.html'">
+                ⬅️ Kembali ke Beranda
+            </button>
+
+            <div class="card">
+                <h3 style="margin-top:0; font-family: 'Fredoka', sans-serif;">Filter & Pencarian</h3>
+                <div class="filters">
+                    <div>
+                        <label style="font-weight: bold; font-size: 0.85rem; color: #64748b;">Cari Siswa:</label>
+                        <input type="text" id="searchNama" placeholder="Ketik nama siswa..." onkeyup="renderData()">
+                    </div>
+                    <div>
+                        <label style="font-weight: bold; font-size: 0.85rem; color: #64748b;">Pilih Kelas:</label>
+                        <select id="filterKelas" onchange="renderData()">
+                            <option value="Semua">Memuat Kelas...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-weight: bold; font-size: 0.85rem; color: #64748b;">Tanggal Awal:</label>
+                        <input type="date" id="filterTglAwal" onchange="renderData()">
+                    </div>
+                    <div>
+                        <label style="font-weight: bold; font-size: 0.85rem; color: #64748b;">Tanggal Akhir:</label>
+                        <input type="date" id="filterTglAkhir" onchange="renderData()">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="primary btn-excel" style="flex: 1;" onclick="exportToExcel()">
+                        <span>📊</span> Export Rekapan Detail
+                    </button>
+                    <button class="primary btn-refresh" onclick="loadDatabase()">
+                        <span>🔄</span> Refresh Server
+                    </button>
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-card stat-aktif">
+                    <h3 id="totalSiswaAktif">-</h3>
+                    <p>Siswa Mengisi</p>
+                </div>
+                <div class="stat-card stat-poin">
+                    <h3 id="rataPoinKelas">-</h3>
+                    <p>Rata-rata Poin Harian</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin:0; font-family: 'Fredoka', sans-serif;">Rekapan Laporan Individu</h3>
+                </div>
+                
+                <div class="table-responsive">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>Nama Siswa</th>
+                                <th>Kelas</th>
+                                <th>Total Poin</th>
+                                <th>Hari Aktif</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan='5' class='center'>Silakan login terlebih dahulu.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="leaderboard" class="page">
+        <div class="container" style="padding-top: 0; margin-top: 20px;">
+            <div class="lb-top-section">
+                <div class="lb-header">
+                    <h2 style="font-size: 1.8rem; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">⭐⭐⭐</h2>
+                    <h2 style="margin: 0;">TOP SKOR</h2>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px; margin-top: 10px;">
+                        <button onclick="changeLbMonth(-1)" style="background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-weight: bold;">◀</button>
+                        <div class="lb-header-sub" id="judulLeaderboardBulan" style="margin-bottom: 0;">MEMUAT...</div>
+                        <button onclick="changeLbMonth(1)" style="background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-weight: bold;">▶</button>
+                    </div>
+                    
+                    <div class="lb-filter-container">
+                        <button class="lb-filter-btn active" id="filter-global" onclick="setLbFilter('global')">GLOBAL</button>
+                        <button class="lb-filter-btn" id="filter-regional" onclick="setLbFilter('regional')">REGIONAL</button>
+                        <button class="lb-filter-btn" id="filter-kelas" onclick="setLbFilter('kelas')">KELAS</button>
+                    </div>
+                </div>
+                <div id="lb-podium-container" class="lb-podium"></div>
+            </div>
+
+            <div class="lb-list-wrapper">
+                <div class="lb-list">
+                    <div id="lb-list-container"></div>
+                    <div class="lb-disclaimer">-- Menampilkan 10 Besar Top Skor (Berdasarkan Rata-Rata) --</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav id="menu">
+        <button onclick="showPage('leaderboard')" id="btn-leaderboard">🏆<br>Top Skor</button>
+        <button onclick="showPage('dashboard')" id="btn-dashboard" class="active">📊<br>Laporan</button>
+    </nav>
+</div>
+
+<div id="detailModal">
+    <div class="modal-wrapper">
+        <button class="close-btn" onclick="closeModal()">✖</button>
+        <div class="modal-header">
+            <div id="modalAvatar" class="modal-avatar-container">🧑</div>
+            <h2 id="modalNama">Nama Siswa</h2>
+            <p id="modalInfo">Kelas -</p>
+        </div>
+        <div class="modal-content">
+            <div id="chartWrapper">
+                <canvas id="studentChart" style="max-height: 180px;"></canvas>
+            </div>
+            <div id="modalDetails"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const FIREBASE_URL = "https://jurnalku-49dbd-default-rtdb.asia-southeast1.firebasedatabase.app/jurusku";
+    const FIREBASE_USERS_URL = "https://jurnalku-49dbd-default-rtdb.asia-southeast1.firebasedatabase.app/jurusku_users";
+
+    let dbData = {};
+    let usersData = {};
+    let currentRenderedData = [];
+    let allStudentsData = []; 
+    
+    let myChart = null; 
+    let currentModalDates = [];
+    let currentModalDateIndex = 0;
+    let currentModalItem = null;
+    let currentLbDate = new Date();
+    let currentLbFilter = 'global';
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        
+        document.getElementById('btn-leaderboard').classList.remove('active');
+        document.getElementById('btn-dashboard').classList.remove('active');
+        document.getElementById('btn-' + pageId).classList.add('active');
+
+        // MENGAKTIFKAN CSS KHUSUS (BG OREN & HIDE HEADER) KETIKA MASUK TOP SKOR
+        if (pageId === 'leaderboard') {
+            document.body.classList.add('lb-active');
+            currentLbDate = new Date(); 
+            updateLeaderboardMonthUI();
+            
+            let y = currentLbDate.getFullYear();
+            let m = currentLbDate.getMonth();
+            let firstDay = new Date(y, m, 1);
+            let lastDay = new Date(y, m + 1, 0);
+            
+            document.getElementById("filterTglAwal").value = formatTanggalKey(firstDay);
+            document.getElementById("filterTglAkhir").value = formatTanggalKey(lastDay);
+            
+            renderData();
+            setLbFilter('global'); 
+        } else {
+            // MENGHILANGKAN EFEK TOP SKOR KETIKA KEMBALI KE LAPORAN
+            document.body.classList.remove('lb-active');
+        }
+    }
+
+    function togglePassword() {
+        const passInput = document.getElementById("kodeGuru");
+        const toggleIcon = document.getElementById("toggleIcon");
+        if (passInput.type === "password") { passInput.type = "text"; toggleIcon.innerText = "🙈"; } 
+        else { passInput.type = "password"; toggleIcon.innerText = "👁️"; }
+    }
+
+    function formatTanggalKey(d = new Date()) { 
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); 
+    }
+
+    function updateLeaderboardMonthUI() {
+        const monthNames = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
+        let label = monthNames[currentLbDate.getMonth()] + " " + currentLbDate.getFullYear();
+        document.getElementById("judulLeaderboardBulan").innerText = label;
+    }
+
+    function changeLbMonth(step) {
+        currentLbDate.setMonth(currentLbDate.getMonth() + step);
+        updateLeaderboardMonthUI();
+        
+        let y = currentLbDate.getFullYear();
+        let m = currentLbDate.getMonth();
+        let firstDay = new Date(y, m, 1);
+        let lastDay = new Date(y, m + 1, 0);
+        
+        document.getElementById("filterTglAwal").value = formatTanggalKey(firstDay);
+        document.getElementById("filterTglAkhir").value = formatTanggalKey(lastDay);
+        
+        renderData();
+        setLbFilter(currentLbFilter); 
+    }
+
+    function loginGuru() {
+        const pass = document.getElementById("kodeGuru").value;
+        if(pass === "Guru123") {
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("mainApp").style.display = "block";
+            
+            let now = new Date();
+            let firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            let lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            
+            document.getElementById("filterTglAwal").value = formatTanggalKey(firstDay);
+            document.getElementById("filterTglAkhir").value = formatTanggalKey(lastDay);
+            
+            updateLeaderboardMonthUI();
+            loadDatabase();
+        } else { alert("❌ Kode Guru salah! Silakan coba lagi."); }
+    }
+
+    document.getElementById('kodeGuru').addEventListener('keypress', function (e) { if (e.key === 'Enter') loginGuru(); });
+
+    async function loadDatabase() {
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "<tr><td colspan='5' class='center'>⏳ Sedang mengambil data dari server...</td></tr>";
+        
+        try {
+            let [resData, resUsers] = await Promise.all([ fetch(FIREBASE_URL + ".json"), fetch(FIREBASE_USERS_URL + ".json") ]);
+            dbData = (await resData.json()) || {}; 
+            usersData = (await resUsers.json()) || {};
+            populateKelas(); renderData();
+        } catch (e) { 
+            tbody.innerHTML = "<tr><td colspan='5' class='center' style='color:red;'>Gagal terhubung ke server. Periksa koneksi internet.</td></tr>";
+        }
+    }
+
+    function populateKelas() {
+        const kelasSet = new Set();
+        for (let user in usersData) { if(usersData[user].kelas) kelasSet.add(usersData[user].kelas); }
+        const selectKelas = document.getElementById("filterKelas");
+        const prevValue = selectKelas.value;
+        selectKelas.innerHTML = '<option value="Semua">Semua Kelas</option>';
+        let arrKelas = Array.from(kelasSet).sort();
+        arrKelas.forEach(k => { let opt = document.createElement("option"); opt.value = k; opt.innerText = k; selectKelas.appendChild(opt); });
+        if(arrKelas.includes(prevValue)) selectKelas.value = prevValue;
+    }
+
+    function getDatesInRange(startDate, endDate) {
+        let dates = []; let currDate = new Date(startDate); let lastDate = new Date(endDate);
+        while(currDate <= lastDate) { dates.push(formatTanggalKey(currDate)); currDate.setDate(currDate.getDate() + 1); }
+        return dates;
+    }
+
+    function renderData() {
+        const tglAwal = document.getElementById("filterTglAwal").value;
+        const tglAkhir = document.getElementById("filterTglAkhir").value;
+        const filterKls = document.getElementById("filterKelas").value;
+        const searchKeyword = document.getElementById("searchNama").value.toLowerCase(); 
+        
+        if(!tglAwal || !tglAkhir || tglAwal > tglAkhir) {
+            document.getElementById("tableBody").innerHTML = "<tr><td colspan='5' class='center'>Rentang tanggal tidak valid.</td></tr>"; return;
+        }
+
+        const dates = getDatesInRange(tglAwal, tglAkhir);
+        document.getElementById("headerDateRange").innerText = `Periode: ${tglAwal} s/d ${tglAkhir}`;
+        const tbody = document.getElementById("tableBody"); tbody.innerHTML = "";
+
+        let totalPoinKumulatif = 0; let siswaAktif = 0;
+        currentRenderedData = []; allStudentsData = []; 
+
+        for (let userKey in usersData) {
+            let uData = usersData[userKey];
+            let kls = uData.kelas || "Tanpa Kelas";
+            let namaSiswa = uData.nama || userKey;
+            let totalPoinSiswa = 0; let hariAktif = 0; let catatanHarian = {}; 
+
+            dates.forEach(d => {
+                if(dbData[d] && dbData[d][userKey]) {
+                    let cat = dbData[d][userKey];
+                    if(cat.poin > 0) { totalPoinSiswa += cat.poin; hariAktif++; catatanHarian[d] = cat; }
+                }
+            });
+
+            let avgPoin = hariAktif > 0 ? Math.round(totalPoinSiswa / hariAktif) : 0;
+
+            let studentObj = { 
+                username: userKey, 
+                nama: namaSiswa, 
+                kelas: kls, 
+                avatar: uData.avatar || "🧑", 
+                totalPoin: totalPoinSiswa, 
+                hariAktif: hariAktif, 
+                avgPoin: avgPoin,
+                catatanHarian: catatanHarian 
+            };
+
+            if (hariAktif > 0) { allStudentsData.push(studentObj); }
+            if (filterKls !== "Semua" && kls !== filterKls) continue;
+            if (searchKeyword && !namaSiswa.toLowerCase().includes(searchKeyword)) continue;
+
+            if(hariAktif > 0) { 
+                totalPoinKumulatif += totalPoinSiswa; 
+                siswaAktif++; 
+                currentRenderedData.push(studentObj); 
+            }
+        }
+
+        // Laporan Tabel: Selalu disortir berdasarkan Total Poin tertinggi
+        currentRenderedData.sort((a, b) => b.totalPoin - a.totalPoin);
+        
+        let rataRata = siswaAktif > 0 ? Math.round(totalPoinKumulatif / siswaAktif) : 0;
+        document.getElementById("rataPoinKelas").innerText = rataRata;
+        document.getElementById("totalSiswaAktif").innerText = siswaAktif;
+
+        if(currentRenderedData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan='5' class='center'>Tidak ada data siswa.</td></tr>`;
+        } else {
+            currentRenderedData.forEach(item => {
+                let tr = document.createElement("tr");
+                let avatarHtml = item.avatar.startsWith('data:image') ? `<img src="${item.avatar}" style="width:35px; height:35px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:10px;">` : `<span style="font-size:1.5rem; vertical-align:middle; margin-right:10px;">${item.avatar}</span>`;
+                let badgeClass = item.hariAktif > 0 ? "badge-success" : "badge-danger";
+                tr.innerHTML = `
+                    <td><div style="display:flex; align-items:center;">${avatarHtml}<div><strong>${item.nama}</strong><br><span style="font-size:0.75rem; color:#94a3b8;">${item.username}</span></div></div></td>
+                    <td><span style="font-weight:600; color:#475569;">${item.kelas}</span></td>
+                    <td><span style="font-size: 1.2rem; font-weight:800; color:var(--primary);">${item.totalPoin}</span></td>
+                    <td><span class="badge ${badgeClass}">${item.hariAktif} Hari Terisi</span></td>
+                    <td><button class="primary" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px;" onclick='bukaDetail(${JSON.stringify(item)})'>Lihat Jurnal</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // Panggil render Top Skor dengan filter terkini
+        setLbFilter(currentLbFilter); 
+    }
+
+    // =========================================================================
+    // LOGIKA TOP SKOR MENGADOPSI 100% DARI SCRIPT.JS (TIE BREAKER & FILTER)
+    // =========================================================================
+function setLbFilter(mode) {
+    currentLbFilter = mode;
+    document.querySelectorAll('.lb-filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('filter-' + mode).classList.add('active');
+    
+    const filterKls = document.getElementById("filterKelas").value;
+    
+    // Ambil angka tingkatan kelas (misal: "10" dari "10 RPL 1")
+    let selectedGrade = "-";
+    if (filterKls !== "Semua") {
+        let match = filterKls.match(/\d+/);
+        selectedGrade = match ? match[0] : "-";
+    }
+
+    // Filter data dari allStudentsData
+    let lbData = allStudentsData.filter(u => {
+        let uKelas = u.kelas || "-";
+        
+        if (mode === 'regional') {
+            if (filterKls === "Semua") return true; // Jika dashboard "Semua", regional jadi global
+            let uGrade = uKelas.match(/\d+/)?.[0] || "-";
+            return uGrade === selectedGrade;
+        } else if (mode === 'kelas') {
+            if (filterKls === "Semua") return true; // Jika dashboard "Semua", kelas jadi global
+            return uKelas === filterKls;
+        }
+        return true; // Global mode
+    }).map(u => ({...u})); 
+    
+    // URUTKAN DATA (Sorting & Tie-Breaker)
+    lbData.sort((a, b) => {
+        if (b.avgPoin !== a.avgPoin) return b.avgPoin - a.avgPoin; 
+        if (b.totalPoin !== a.totalPoin) return b.totalPoin - a.totalPoin; 
+        return a.username.localeCompare(b.username); 
+    });
+
+    // Logika Tie-Breaker (Mencegah poin sama persis di tampilan)
+    for (let i = 1; i < lbData.length; i++) {
+        if (lbData[i].avgPoin >= lbData[i-1].avgPoin) {
+            lbData[i].avgPoin = Math.max(0, lbData[i-1].avgPoin - 1);
+        }
+    }
+    
+    renderLbUI(lbData); // Pindah ke fungsi terpisah agar bersih
+}
+
+function renderLbUI(lbData) {
+    let podiumHTML = ''; let listHTML = '';
+    let podiumIndices = [1, 0, 2]; 
+    let podiumClasses = ['podium-2', 'podium-1', 'podium-3']; 
+    let medals = ['🥈', '🥇', '🥉'];
+    let podiumBorderColors = ['#bdc3c7', '#f1c40f', '#cd7f32']; 
+    let podiumScoreSizes = ['1.4rem', '1.7rem', '1.2rem'];
+    let podiumAvatarSizes = ['2.4rem', '3.4rem', '2rem'];
+    
+    for (let i = 0; i < 3; i++) {
+        let item = lbData[podiumIndices[i]];
+        if(item) {
+            let avatarClass = item.avatar.startsWith('data:') ? `<img src="${item.avatar}">` : item.avatar;
+            let rankBadge = `<div class="rank-badge" style="border: 2px solid ${podiumBorderColors[i]};">${medals[i]}</div>`;
+            
+            podiumHTML += `
+            <div class="lb-podium-item ${podiumClasses[i]}" style="background: #fff !important; border: 3px solid ${podiumBorderColors[i]}; border-radius: 20px;">
+                <div class="lb-avatar" style="background: #fff; border: 4px solid ${podiumBorderColors[i]} !important; font-size:${podiumAvatarSizes[i]};">
+                    ${avatarClass}
+                    ${rankBadge}
+                </div>
+                <div class="lb-podium-name">${item.nama}</div>
+                <div class="lb-podium-kelas">Kelas ${item.kelas}</div>
+                <div class="lb-podium-score" style="font-size: ${podiumScoreSizes[i]};">${item.avgPoin}</div>
+            </div>`;
+        } else {
+            podiumHTML += `<div class="lb-podium-item ${podiumClasses[i]}" style="background: #fff !important; border: 3px solid ${podiumBorderColors[i]}; opacity:0.5; justify-content:center; border-radius: 20px;"><div class="lb-podium-name">-</div><div class="lb-podium-score" style="font-size: ${podiumScoreSizes[i]};">0</div></div>`;
+        }
+    }
+    
+    const borderHijauForest = '#228b22';
+    for(let i=3; i<Math.min(10, lbData.length); i++) {
+        let item = lbData[i]; 
+        let avatar = item.avatar.startsWith('data:') ? `<img src="${item.avatar}">` : item.avatar;
+        listHTML += `
+            <div class="lb-item">
+                <div class="lb-item-num">${i + 1}</div>
+                <div class="lb-item-avatar" style="background:#fff; border: 2px solid ${borderHijauForest}; font-size:1.5rem;">${avatar}</div>
+                <div class="lb-item-info">
+                    <div style="display:flex; flex-direction:column; max-width: 70%;">
+                        <span class="lb-item-name">${item.nama}</span>
+                        <span style="font-size:0.75rem; color:#94a3b8; font-weight:bold; margin-top:3px;">Kelas ${item.kelas}</span>
+                    </div>
+                </div>
+                <div class="lb-item-score" style="font-size: 1.1rem;">${item.avgPoin} <span style="font-size:0.7rem; color:#94a3b8; font-weight:700;"></span></div>
+            </div>`;
+    }
+    
+    if (lbData.length === 0) { 
+        podiumHTML = `<div style="color:white; font-weight:bold; margin-bottom:20px; text-align:center; width:100%;">Tidak ada data untuk periode ini.</div>`; 
+        listHTML = ''; 
+    }
+    
+    document.getElementById('lb-podium-container').innerHTML = podiumHTML;
+    document.getElementById('lb-list-container').innerHTML = listHTML;
+}
+
+
+    function bukaDetail(item) {
+        document.getElementById("detailModal").style.display = "flex";
+        document.getElementById("modalNama").innerText = item.nama;
+        const tglAwal = document.getElementById("filterTglAwal").value;
+        const tglAkhir = document.getElementById("filterTglAkhir").value;
+        document.getElementById("modalInfo").innerText = `Kelas: ${item.kelas} | Periode: ${tglAwal} s/d ${tglAkhir}`;
+        document.getElementById("modalAvatar").innerHTML = item.avatar.startsWith('data:image') ? `<img src="${item.avatar}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--primary);">` : item.avatar;
+
+        let detailDiv = document.getElementById("modalDetails");
+        detailDiv.innerHTML = "";
+        
+        currentModalItem = item;
+        currentModalDates = Object.keys(item.catatanHarian).sort(); 
+
+        const canvas = document.getElementById('studentChart');
+        const chartWrapper = document.getElementById('chartWrapper');
+        
+        if (currentModalDates.length > 3) {
+            chartWrapper.style.display = "block";
+            const ctx = canvas.getContext('2d');
+            if (myChart) { myChart.destroy(); } 
+            const labels = currentModalDates.map(d => d.split('-').slice(1).join('/')); 
+            const points = currentModalDates.map(d => item.catatanHarian[d].poin);
+            myChart = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Poin', data: points, borderColor: '#1db954', backgroundColor: 'rgba(29, 185, 84, 0.1)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#1db954', pointRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } } });
+        } else { chartWrapper.style.display = "none"; if (myChart) { myChart.destroy(); } }
+
+        if(item.hariAktif === 0 || currentModalDates.length === 0) { detailDiv.innerHTML = `<div style="text-align:center; padding: 20px; background:#fee2e2; border-radius:15px; color:#991b1b; margin-top:20px;"><strong>Belum mengisi jurnal.</strong></div>`; return; }
+        currentModalDateIndex = 0; renderModalDate();
+    }
+
+    function renderModalDate() {
+        let detailDiv = document.getElementById("modalDetails");
+        let tgl = currentModalDates[currentModalDateIndex];
+        let cat = currentModalItem.catatanHarian[tgl];
+        let p = cat.pilar || {}; let inputs = cat.inputs || {};
+        
+        let sholatList = [];
+        ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'].forEach(s => { if(cat['sholat_' + s] === true) sholatList.push(`✅ ${s}`); });
+        let sholatTxt = sholatList.length > 0 ? sholatList.join(" &nbsp; ") : "<em style='color:#94a3b8;'>❌ Kosong</em>";
+
+        let html = `<div class="date-divider">📅 Jurnal Tanggal: ${tgl} (Total: ${cat.poin} Poin)</div><h4 style="margin-bottom:10px; color:var(--primary-dark);">📝 Detail Catatan:</h4>`;
+        html += `<div class="info-row"><div class="info-label">🌅 Bangun Pagi (${p.bangun || 0} Poin)</div><div class="info-value">Jam: ${cat.bangun || "-"}</div></div>`;
+        html += `<div class="info-row"><div class="info-label">🙏 Beribadah (${p.sholat || 0} Poin)</div><div class="info-value">${sholatTxt}</div></div>`;
+        html += `<div class="info-row"><div class="info-label">⚽ Olahraga (${p.olahraga || 0} Poin)</div><div class="info-value">${inputs.olahraga || "Kosong"}</div></div>`;
+        html += `<div class="info-row"><div class="info-label">🥗 Makan Sehat (${p.makan || 0} Poin)</div><div class="info-value">${inputs.makan || "Kosong"}</div></div>`;
+        html += `<div class="info-row"><div class="info-label">💡 Gemar Belajar (${p.belajar || 0} Poin)</div><div class="info-value">${inputs.belajar || "Kosong"}</div></div>`;
+        html += `<div class="info-row"><div class="info-label">🤝 Bermasyarakat (${p.masyarakat || 0} Poin)</div><div class="info-value">${inputs.masyarakat || "Kosong"}</div></div>`;
+        html += `<div class="info-row"><div class="info-label">🌙 Tidur Cepat (${p.tidur || 0} Poin)</div><div class="info-value">Jam: ${cat.tidur_val || "-"}</div></div>`;
+
+        if (currentModalDates.length > 1) {
+            let btnPrevDisabled = (currentModalDateIndex === 0) ? "disabled" : "";
+            let btnNextDisabled = (currentModalDateIndex === currentModalDates.length - 1) ? "disabled" : "";
+            html += `<div class="modal-nav"><button class="primary" ${btnPrevDisabled} onclick="changeModalDate(-1)">⬅️ Prev</button><span style="font-weight: 800;">Hal ${currentModalDateIndex + 1} / ${currentModalDates.length}</span><button class="primary" ${btnNextDisabled} onclick="changeModalDate(1)">Next ➡️</button></div>`;
+        }
+        detailDiv.innerHTML = html; document.querySelector('.modal-content').scrollTop = 0;
+    }
+
+    function changeModalDate(step) {
+        let newIndex = currentModalDateIndex + step;
+        if (newIndex >= 0 && newIndex < currentModalDates.length) { currentModalDateIndex = newIndex; renderModalDate(); }
+    }
+    function closeModal() { document.getElementById("detailModal").style.display = "none"; }
+
+    function exportToExcel() {
+        const tglAwal = document.getElementById("filterTglAwal").value;
+        const tglAkhir = document.getElementById("filterTglAkhir").value;
+        const filterKls = document.getElementById("filterKelas").value;
+        const searchKeyword = document.getElementById("searchNama").value.toLowerCase();
+        const dates = getDatesInRange(tglAwal, tglAkhir);
+        let exportData = [];
+        
+        Object.keys(usersData).forEach(uKey => {
+            let user = usersData[uKey];
+            if (filterKls !== "Semua" && user.kelas !== filterKls) return;
+            if (searchKeyword && !(user.nama || uKey).toLowerCase().includes(searchKeyword)) return;
+            
+            dates.forEach(d => {
+                let catatan = dbData[d]?.[uKey];
+                if (catatan && catatan.poin > 0) {
+                    let inputs = catatan.inputs || {};
+                    let sholatTxt = ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'].filter(s => catatan['sholat_'+s]).map(s => `✅ ${s}`).join(", ");
+                    exportData.push({
+                        "Tanggal": d, "Nama Siswa": user.nama || uKey, "Kelas": user.kelas || "-", "Jam Bangun": catatan.bangun || "-", "Ibadah": sholatTxt || "Kosong", "Olahraga": inputs.olahraga || "Kosong", "Makan Sehat": inputs.makan || "Kosong", "Gemar Belajar": inputs.belajar || "Kosong", "Bermasyarakat": inputs.masyarakat || "Kosong", "Jam Tidur": catatan.tidur_val || "-", "Total Poin": catatan.poin
+                    });
+                }
+            });
+        });
+        
+        if (exportData.length === 0) { alert("Data kosong di rentang tanggal/filter tersebut."); return; }
+        
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        ws['!cols'] = [{wch:12}, {wch:22}, {wch:10}, {wch:12}, {wch:45}, {wch:20}, {wch:20}, {wch:20}, {wch:20}, {wch:12}, {wch:10}];
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Rekapan_Detail");
+        XLSX.writeFile(wb, `Laporan_Jurusku_${tglAwal}_ke_${tglAkhir}.xlsx`);
+    }
+</script>
+
+</body>
+</html>

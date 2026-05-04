@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>JURUSKU - Panel Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #334155; padding: 20px; margin: 0; }
+        .container { max-width: 900px; margin: 40px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); display: none; }
+        
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #15803d; display: flex; align-items: center; justify-content: center; z-index: 2000;
+        }
+        .login-card {
+            background: white; padding: 40px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        h1 { color: #15803d; text-align: center; margin-top: 0; }
+        .flex-box { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+        .form-box { flex: 1; min-width: 300px; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        
+        input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
+        
+        button { padding: 12px 18px; background: #1db954; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button.btn-back { background: #64748b; margin-bottom: 20px; }
+        button.btn-danger { background: #e74c3c; }
+        button:hover { opacity: 0.8; transform: translateY(-1px); }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; background: white; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+        th { background: #15803d; color: white; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        
+        .toast { position: fixed; top: 20px; right: 20px; background: #fbc531; padding: 15px; border-radius: 8px; font-weight: bold; display: none; z-index: 3000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+<div class="toast" id="adminToast">Info!</div>
+
+<div id="loginOverlay">
+    <div class="login-card">
+        <h2 style="margin-top:0;">🔒 Admin Login</h2>
+        <p style="color: #64748b; margin-bottom: 20px;">Silahkan masukkan password panel admin</p>
+        <input type="password" id="passAdmin" placeholder="Password Admin...">
+        <button onclick="checkAdminLogin()" style="width: 100%; margin-top: 10px; font-size: 1rem;">Masuk ke Panel</button>
+        <div style="margin: 20px 0; color: #cbd5e1;"></div>
+        <button class="btn-back" onclick="window.location.href='../index.html'" style="width: 100%; margin: 0;">Kembali ke Beranda</button>
+    </div>
+</div>
+
+<div class="container" id="adminContent">
+    <button class="btn-back" onclick="window.location.href='../index.html'">← Kembali ke Beranda</button>
+    
+    <h1>🚀 Admin Jurusku: Manajemen User</h1>
+    
+    <div class="flex-box">
+        <div class="form-box">
+            <h3>➕ Tambah / Edit Siswa</h3>
+            <input type="text" id="adminUsername" placeholder="Username">
+            <input type="text" id="adminNama" placeholder="Nama Lengkap">
+            <input type="text" id="adminKelas" placeholder="Kelas">
+            <input type="text" id="adminPassword" placeholder="Kata Sandi">
+            <button onclick="saveUserManual()">Simpan Akun</button>
+            <button onclick="batalEdit()" style="background:#94a3b8; display:none;" id="btnBatal">Batal Edit</button>
+        </div>
+
+        <div class="form-box">
+            <h3>📥 Import dari Excel</h3>
+            <input type="file" id="excelFile" accept=".xlsx, .xls">
+            <button onclick="importExcel()" style="background: #f39c12; width: 100%;">Proses Import Excel</button>
+        </div>
+    </div>
+
+    <hr style="border:0; border-top: 1px solid #e2e8f0; margin: 30px 0;">
+
+    <h3>📋 Daftar Pengguna</h3>
+    <button onclick="loadUsers()" style="margin-bottom: 10px; background: #3498db;">🔄 Refresh Data</button>
+    <div style="overflow-x: auto;">
+        <table id="userTable">
+            <thead>
+                <tr>
+                    <th>No</th><th>Username</th><th>Nama</th><th>Kelas</th><th>Pass</th><th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="userList">
+                <tr><td colspan="6" style="text-align:center;">Memuat data...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const ADMIN_PASSWORD_SECRET = "admin123"; 
+const FIREBASE_USERS_URL = "https://jurnalku-49dbd-default-rtdb.asia-southeast1.firebasedatabase.app/jurusku_users";
+
+function checkAdminLogin() {
+    const passInput = document.getElementById("passAdmin").value;
+    if(passInput === ADMIN_PASSWORD_SECRET) {
+        document.getElementById("loginOverlay").style.display = "none";
+        document.getElementById("adminContent").style.display = "block";
+        loadUsers();
+    } else {
+        alert("❌ Password Salah!");
+    }
+}
+
+// Tambahan agar bisa tekan Enter untuk login
+document.getElementById("passAdmin").addEventListener("keypress", (e) => { if(e.key === "Enter") checkAdminLogin(); });
+
+function showToast(msg) {
+    let t = document.getElementById("adminToast");
+    t.innerText = msg; t.style.display = "block";
+    setTimeout(() => { t.style.display = "none"; }, 3000);
+}
+
+function safeKey(str) { return str.replace(/\./g, ','); }
+function restoreKey(str) { return str.replace(/,/g, '.'); }
+
+async function loadUsers() {
+    let tbody = document.getElementById("userList");
+    tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>Sinkronisasi...</td></tr>";
+    try {
+        let res = await fetch(FIREBASE_USERS_URL + ".json");
+        let users = await res.json();
+        tbody.innerHTML = "";
+        if (!users) { tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>Data Kosong.</td></tr>"; return; }
+        let no = 1;
+        for (let dbKey in users) {
+            let u = users[dbKey];
+            let displayUname = restoreKey(dbKey);
+            let tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${no++}</td>
+                <td><strong>${displayUname}</strong></td>
+                <td>${u.nama || '-'}</td>
+                <td>${u.kelas || '-'}</td>
+                <td>${u.password || '-'}</td>
+                <td>
+                    <button onclick="editForm('${displayUname}', '${u.nama || ''}', '${u.kelas || ''}', '${u.password || ''}')" style="padding:5px; font-size:0.8rem;">Edit</button>
+                    <button class="btn-danger" onclick="deleteUser('${displayUname}')" style="padding:5px; font-size:0.8rem;">Hapus</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
+    } catch (e) { showToast("❌ Gagal memuat data!"); }
+}
+
+function editForm(uname, nama, kelas, pass) {
+    document.getElementById("adminUsername").value = uname;
+    document.getElementById("adminNama").value = nama;
+    document.getElementById("adminKelas").value = kelas;
+    document.getElementById("adminPassword").value = pass;
+    document.getElementById("adminUsername").readOnly = true; 
+    document.getElementById("adminUsername").style.background = "#e2e8f0";
+    document.getElementById("btnBatal").style.display = "inline-block";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function batalEdit() {
+    document.getElementById("adminUsername").value = "";
+    document.getElementById("adminNama").value = "";
+    document.getElementById("adminKelas").value = "";
+    document.getElementById("adminPassword").value = "";
+    document.getElementById("adminUsername").readOnly = false;
+    document.getElementById("adminUsername").style.background = "#fff";
+    document.getElementById("btnBatal").style.display = "none";
+}
+
+async function saveUserManual() {
+    let uname = document.getElementById("adminUsername").value.trim().replace(/\s/g, '');
+    let nama = document.getElementById("adminNama").value.trim();
+    let kelas = document.getElementById("adminKelas").value.trim();
+    let pass = document.getElementById("adminPassword").value.trim();
+    if (!uname || !pass) { showToast("⚠️ Isi Username & Password!"); return; }
+    let dbKey = safeKey(uname);
+    try {
+        await fetch(FIREBASE_USERS_URL + "/" + dbKey + ".json", {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nama: nama, kelas: kelas, password: pass })
+        });
+        showToast("✅ Berhasil disimpan!");
+        batalEdit(); loadUsers();
+    } catch (e) { showToast("❌ Gagal menyimpan!"); }
+}
+
+async function deleteUser(uname) {
+    if (!confirm("Hapus " + uname + "?")) return;
+    try {
+        await fetch(FIREBASE_USERS_URL + "/" + safeKey(uname) + ".json", { method: 'DELETE' });
+        loadUsers();
+    } catch (e) { showToast("❌ Gagal hapus!"); }
+}
+
+function importExcel() {
+    let fileUpload = document.getElementById("excelFile");
+    if (fileUpload.files.length === 0) return;
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        let data = new Uint8Array(e.target.result);
+        let workbook = XLSX.read(data, {type: 'array'});
+        let rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
+        let promises = [];
+        for (let i = 1; i < rows.length; i++) {
+            let cols = rows[i];
+            if (cols[0] && cols[3]) {
+                promises.push(fetch(FIREBASE_USERS_URL + "/" + safeKey(cols[0].toString()) + ".json", {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nama: cols[1], kelas: cols[2], password: cols[3].toString() })
+                }));
+            }
+        }
+        Promise.all(promises).then(() => { showToast("✅ Import Berhasil!"); loadUsers(); });
+    };
+    reader.readAsArrayBuffer(fileUpload.files[0]);
+}
+</script>
+</body>
+</html>

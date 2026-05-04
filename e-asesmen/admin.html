@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - E-Asesmen</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+        body { background: #f0f2f5; font-family: 'Poppins', sans-serif; padding: 40px 20px; color: #333; display: flex; justify-content: center; }
+        .admin-wrapper { width: 100%; max-width: 650px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        h1 { color: #764ba2; text-align: center; margin-bottom: 20px; }
+        .login-box { text-align: center; padding: 20px; }
+        input[type="password"], input[type="text"] { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; outline: none; }
+        .admin-group { border: 1px solid #eee; padding: 20px; border-radius: 15px; margin-bottom: 20px; background: #fafafa; }
+        .admin-group h3 { margin-bottom: 15px; color: #555; border-left: 5px solid #764ba2; padding-left: 10px; }
+        .input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; background: white; padding: 10px; border-radius: 10px; border: 1px solid #eee; }
+        .input-row label { flex: 1; font-size: 0.8rem; font-weight: bold; color: #555; }
+        .input-row input { flex: 2; margin: 0; font-size: 0.85rem; padding: 8px; }
+        .btn-toggle { background: #eee; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: 0.3s; }
+        .btn-toggle.active { background: #764ba2; color: white; }
+        .btn-toggle.inactive { background: #dfe4ea; color: #a4b0be; text-decoration: line-through; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.3s; }
+        .btn-primary { background: #764ba2; color: white; margin-top: 20px; }
+        .btn-primary:hover { background: #5a3a7d; }
+        .btn-add { background: #e0e0e0; color: #666; font-size: 0.8rem; padding: 10px; margin-top: 10px; }
+        .hidden { display: none; }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #999; text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="login-section" class="login-box">
+            <h1>🔐 Admin Login</h1>
+            <input type="password" id="pass-input" placeholder="Sandi Admin">
+            <button class="btn btn-primary" onclick="checkPass()">Masuk</button>
+            <a href="siswa.html" class="back-link">Kembali ke Halaman Siswa</a>
+        </div>
+
+        <div id="admin-section" class="hidden">
+            <h1>⚙️ Pengaturan Mapel</h1>
+            <p style="text-align: center; font-size: 0.8rem; color: #888; margin-bottom: 20px;">Klik ikon 👁️ untuk Memunculkan/Menyembunyikan mapel di siswa</p>
+            <div id="form-container">Memuat data dari Firebase...</div>
+            <button class="btn btn-primary" onclick="saveData()">💾 Simpan Semua Perubahan</button>
+            <button class="btn btn-add" style="margin-top:20px; background:#ff4757; color:white;" onclick="location.reload()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        const MASTER_PASS = "admin123";
+        const FIREBASE_URL = "https://linke-asesmen-default-rtdb.asia-southeast1.firebasedatabase.app/asesmen.json";
+        
+        const mapelDefault = ["Matematika", "IPA", "IPS", "Bahasa Indonesia", "Bahasa Inggris", "Pendidikan Pancasila", "Pendidikan Agama", "PJOK", "Seni Budaya", "Prakarya", "Informatika", "Koding", "Bahasa Arab"];
+        let db = { "7": {}, "8": {}, "9": {} };
+
+        async function loadData() {
+            try {
+                const response = await fetch(FIREBASE_URL);
+                const data = await response.json();
+                if (data) {
+                    db = data;
+                } else {
+                    ['7','8','9'].forEach(kls => {
+                        mapelDefault.forEach(m => {
+                            db[kls][m] = { link: "", visible: false };
+                        });
+                    });
+                }
+                renderForm();
+            } catch (e) {
+                document.getElementById('form-container').innerText = "Gagal memuat data. Periksa koneksi atau Firebase Rules.";
+            }
+        }
+
+        function checkPass() {
+            if(document.getElementById('pass-input').value === MASTER_PASS) {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('admin-section').classList.remove('hidden');
+                loadData();
+            } else { alert("Sandi Salah!"); }
+        }
+
+        function renderForm() {
+            const container = document.getElementById('form-container');
+            container.innerHTML = '';
+            ['7','8','9'].forEach(kls => {
+                const romawi = kls=='7'?'VII':kls=='8'?'VIII':'IX';
+                let html = `<div class="admin-group"><h3>Kelas ${romawi}</h3>`;
+                for(let m in db[kls]) {
+                    const isVisible = db[kls][m].visible;
+                    html += `
+                    <div class="input-row">
+                        <button class="btn-toggle ${isVisible ? 'active' : 'inactive'}" 
+                                onclick="toggleVisibility('${kls}', '${m}')" title="Klik untuk Show/Hide">
+                            ${isVisible ? '👁️' : '🙈'}
+                        </button>
+                        <label>${m}</label>
+                        <input type="text" id="input-${kls}-${m}" value="${db[kls][m].link}" placeholder="Paste link kuis...">
+                    </div>`;
+                }
+                html += `<button class="btn btn-add" onclick="addCustom('${kls}')">+ Mapel Custom</button></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function toggleVisibility(kls, mpl) {
+            db[kls][mpl].visible = !db[kls][mpl].visible;
+            renderForm();
+        }
+
+        function addCustom(kls) {
+            const name = prompt("Nama Mapel Baru:");
+            if(name) { 
+                db[kls][name] = { link: "", visible: true }; 
+                renderForm(); 
+            }
+        }
+
+        async function saveData() {
+            ['7','8','9'].forEach(kls => {
+                for(let m in db[kls]) {
+                    const inputEl = document.getElementById(`input-${kls}-${m}`);
+                    if(inputEl) db[kls][m].link = inputEl.value;
+                }
+            });
+
+            try {
+                const response = await fetch(FIREBASE_URL, {
+                    method: 'PUT',
+                    body: JSON.stringify(db)
+                });
+                if(response.ok) alert("✅ Berhasil Disimpan ke Firebase!");
+            } catch (e) {
+                alert("Gagal menyimpan data ke cloud.");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruang Belajar Seru - SMP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="no-scroll"> <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <h1 class="splash-title">Hai, Sobat Juara! <span class="anim-wave">👋</span></h1>
+            <p class="splash-desc">Mau ngapain hari ini? Baca cerita, nonton eksperimen, main tebak-tebakan, dengerin podcast, atau baca komik? Pilih petualanganmu!</p>
+            <button class="btn-splash" onclick="tutupSplash()">Mulai Eksplorasi</button>
+        </div>
+    </div>
+
+    <div id="main-app" class="main-app">
+        <header>
+            <a href="#" class="logo">Ruang<span>Seru.</span></a>
+            <button id="theme-toggle" class="btn-theme">🌙 Mode Gelap</button>
+        </header>
+
+        <div class="container-pencarian">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" placeholder="🔍 Cari petualangan serumu di sini..." onkeyup="cariItem()">
+                <span id="clear-search" class="clear-btn d-none" onclick="hapusPencarian()">❌</span>
+            </div>
+        </div>
+
+        <div class="sapaan" id="sapaan-waktu"></div>
+
+        <div class="filter-kategori">
+            <button class="btn-filter aktif" onclick="filterItem('semua')">🌟 Semua</button>
+            <button class="btn-filter" onclick="filterItem('buku')">📚 E-Buku</button>
+            <button class="btn-filter" onclick="filterItem('video')">🎬 Video</button>
+            <button class="btn-filter" onclick="filterItem('game')">🎮 Game</button>
+            <button class="btn-filter" onclick="filterItem('podcast')">🎧 Podcast</button>
+            <button class="btn-filter" onclick="filterItem('komik')">🎨 Komik</button>
+        </div>
+
+        <section class="rak-koleksi" id="area-koleksi">
+            
+            <div class="kartu-item hidden" data-kategori="buku"><div class="ikon-item">🚀</div><span class="badge badge-buku">IPA</span><h3>Jelajah Tata Surya</h3><p>Kenalan lebih dekat dengan planet tetangga kita. Awas ada lubang hitam!</p><button class="btn-aksi" onclick="bukaModal('Jelajah Tata Surya', '🚀', 'buku')">📖 Baca Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="buku"><div class="ikon-item">🕵️‍♂️</div><span class="badge badge-buku">Fiksi</span><h3>Misteri Jam Istirahat</h3><p>Ke mana hilangnya piala sekolah? Ikuti detektif OSIS memecahkan kasus ini!</p><button class="btn-aksi" onclick="bukaModal('Misteri Jam Istirahat', '🕵️‍♂️', 'buku')">📖 Baca Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="buku"><div class="ikon-item">💻</div><span class="badge badge-buku">Koding</span><h3>Logika Dasar Pemrograman</h3><p>Belajar cara berpikir seperti programmer dengan contoh sehari-hari.</p><button class="btn-aksi" onclick="bukaModal('Logika Dasar Pemrograman', '💻', 'buku')">📖 Baca Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="buku"><div class="ikon-item">🕌</div><span class="badge badge-buku">Agama</span><h3>Kisah Teladan Para Nabi</h3><p>Cerita inspiratif dan nilai moral dari perjuangan para utusan Allah.</p><button class="btn-aksi" onclick="bukaModal('Kisah Teladan Nabi', '🕌', 'buku')">📖 Baca Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="buku"><div class="ikon-item">🎭</div><span class="badge badge-buku">Seni</span><h3>Mengenal Teater Tradisional</h3><p>Menyelami keindahan Lenong, Ludruk, dan Ketoprak dari berbagai daerah.</p><button class="btn-aksi" onclick="bukaModal('Mengenal Teater', '🎭', 'buku')">📖 Baca Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="buku"><div class="ikon-item">🌍</div><span class="badge badge-buku">IPS</span><h3>Menjelajah Benua Biru</h3><p>Pelajari sejarah letak geografis, budaya, dan negara-negara di benua Eropa.</p><button class="btn-aksi" onclick="bukaModal('Menjelajah Benua Biru', '🌍', 'buku')">📖 Baca Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="buku"><div class="ikon-item">🗣️</div><span class="badge badge-buku">Bahasa</span><h3>Jurus Mahir English</h3><p>Kosakata harian dan grammar gampang untuk percakapan bahasa Inggris.</p><button class="btn-aksi" onclick="bukaModal('Jurus Mahir English', '🗣️', 'buku')">📖 Baca Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="buku"><div class="ikon-item">🤝</div><span class="badge badge-buku">PKn</span><h3>Makna Sila Pancasila</h3><p>Memahami penerapan Pancasila di lingkungan sekolah dan masyarakat.</p><button class="btn-aksi" onclick="bukaModal('Makna Pancasila', '🤝', 'buku')">📖 Baca Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="buku"><div class="ikon-item">🧲</div><span class="badge badge-buku">IPA</span><h3>Misteri Gaya Magnet</h3><p>Bagaimana kompas bekerja? Mengapa besi bisa saling menempel?</p><button class="btn-aksi" onclick="bukaModal('Misteri Gaya Magnet', '🧲', 'buku')">📖 Baca Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="buku"><div class="ikon-item">💰</div><span class="badge badge-buku">IPS</span><h3>Ekonomi Sederhana Pelajar</h3><p>Mengenal uang, menabung, dan prinsip dasar jual beli di pasar.</p><button class="btn-aksi" onclick="bukaModal('Ekonomi Pelajar', '💰', 'buku')">📖 Baca Sekarang</button></div>
+
+            <div class="kartu-item hidden" data-kategori="video"><div class="ikon-item anim-pulse">🌋</div><span class="badge badge-video">IPA</span><h3>Eksperimen Gunung Meletus</h3><p>Tonton simulasi reaksi kimia yang bikin gunung berapi buatan meledak!</p><button class="btn-aksi" onclick="bukaModal('Gunung Meletus', '🌋', 'video')">▶️ Tonton Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="video"><div class="ikon-item anim-pulse">🤖</div><span class="badge badge-video">Koding / AI</span><h3>Cara Kerja AI & Robotika</h3><p>Bagaimana komputer bisa berpikir layaknya manusia? Temukan jawabannya.</p><button class="btn-aksi" onclick="bukaModal('Cara Kerja AI', '🤖', 'video')">▶️ Tonton Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="video"><div class="ikon-item anim-pulse">⚔️</div><span class="badge badge-video">Sejarah</span><h3>Animasi Perang Diponegoro</h3><p>Visualisasi epik perjuangan Pangeran Diponegoro melawan penjajah.</p><button class="btn-aksi" onclick="bukaModal('Perang Diponegoro', '⚔️', 'video')">▶️ Tonton Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="video"><div class="ikon-item anim-pulse">🕋</div><span class="badge badge-video">Agama</span><h3>Sejarah Masuknya Islam di Nusantara</h3><p>Jejak Wali Songo dan penyebaran damai agama Islam di Indonesia.</p><button class="btn-aksi" onclick="bukaModal('Sejarah Islam', '🕋', 'video')">▶️ Tonton Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="video"><div class="ikon-item anim-pulse">🎸</div><span class="badge badge-video">Seni</span><h3>Tutorial Gitar Pemula</h3><p>Belajar memetik kunci-kunci dasar gitar dalam 10 menit pertama.</p><button class="btn-aksi" onclick="bukaModal('Tutorial Gitar', '🎸', 'video')">▶️ Tonton Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="video"><div class="ikon-item anim-pulse">➗</div><span class="badge badge-video">Matematika</span><h3>Trik Cepat Aljabar</h3><p>Rumus rahasia menghitung cepat soal aljabar tanpa coret-coretan panjang.</p><button class="btn-aksi" onclick="bukaModal('Trik Aljabar', '➗', 'video')">▶️ Tonton Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="video"><div class="ikon-item anim-pulse">🏀</div><span class="badge badge-video">Olahraga</span><h3>Teknik Dasar Bola Basket</h3><p>Cara dribble, passing, dan shooting yang benar ala pemain profesional.</p><button class="btn-aksi" onclick="bukaModal('Teknik Basket', '🏀', 'video')">▶️ Tonton Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="video"><div class="ikon-item anim-pulse">🧪</div><span class="badge badge-video">IPA</span><h3>Reaksi Kimia Berubah Warna</h3><p>Eksperimen seru mencampur cairan yang bisa berubah seperti sulap.</p><button class="btn-aksi" onclick="bukaModal('Reaksi Kimia', '🧪', 'video')">▶️ Tonton Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="video"><div class="ikon-item anim-pulse">🎙️</div><span class="badge badge-video">Bahasa</span><h3>Pidato Keren Bung Karno</h3><p>Kompilasi rekaman asli pidato proklamasi yang membakar semangat.</p><button class="btn-aksi" onclick="bukaModal('Pidato Bung Karno', '🎙️', 'video')">▶️ Tonton Sekarang</button></div>
+            <div class="kartu-item hidden" data-kategori="video"><div class="ikon-item anim-pulse">🌐</div><span class="badge badge-video">Koding</span><h3>Bikin Website Pertama</h3><p>Langkah mudah membuat website dari nol dengan HTML & CSS.</p><button class="btn-aksi" onclick="bukaModal('Bikin Website', '🌐', 'video')">▶️ Tonton Sekarang</button></div>
+
+            <div class="kartu-item hidden" data-kategori="game"><div class="ikon-item anim-float">🧩</div><span class="badge badge-game">Matematika</span><h3>Labirin Pecahan</h3><p>Cari jalan keluar dari piramida Mesir dengan menjawab teka-teki pecahan.</p><button class="btn-aksi" onclick="bukaModal('Labirin Pecahan', '🧩', 'game')">🎮 Mulai Main</button></div>
+            <div class="kartu-item hidden" data-kategori="game"><div class="ikon-item anim-wiggle">🥷</div><span class="badge badge-game">Sejarah</span><h3>Tebak Tokoh Sejarah</h3><p>Uji wawasanmu! Cocokkan siluet wajah pahlawan dengan nama mereka.</p><button class="btn-aksi" onclick="bukaModal('Tebak Tokoh', '🥷', 'game')">🎮 Mulai Main</button></div>
+            <div class="kartu-item hidden" data-kategori="game"><div class="ikon-item anim-float">👾</div><span class="badge badge-game">Koding</span><h3>Blok Kode Beraksi</h3><p>Susun blok logika untuk membantu si robot keluar dari rintangan.</p><button class="btn-aksi" onclick="bukaModal('Blok Kode Beraksi', '👾', 'game')">🎮 Mulai Main</button></div>
+            <div class="kartu-item hidden" data-kategori="game"><div class="ikon-item anim-wiggle">📿</div><span class="badge badge-game">Agama</span><h3>Kuis Tajwid Cerdas</h3><p>Dengarkan audio ngaji dan tebak hukum tajwidnya (Idgham, Ikhfa, dll).</p><button class="btn-aksi" onclick="bukaModal('Kuis Tajwid', '📿', 'game')">🎮 Mulai Main</button></div>
+            <div class="kartu-item hidden" data-kategori="game"><div class="ikon-item anim-float">🐯</div><span class="badge badge-game">IPA</span><h3>Klasifikasi Fauna</h3><p>Tarik dan lepas hewan ke habitat aslinya masing-masing.</p><button class="btn-aksi" onclick="bukaModal('Klasifikasi Fauna', '🐯', 'game')">🎮 Mulai Main</button></div>
+            <div class="kartu-item hidden" data-kategori="game"><div class="ikon-item anim-wiggle">🎨</div><span class="badge badge-game">Seni</span><h3>Campur Warna Ajaib</h3><p>Campurkan warna primer di layar untuk mendapatkan target warna yang diminta.</p><button class="btn-aksi" onclick="bukaModal('Campur Warna', '🎨', 'game')">🎮 Mulai Main</button></div>
+            <div class="kartu-item hidden" data-kategori="game"><div class="ikon-item anim-float">🗺️</div><span class="badge badge-game">IPS</span><h3>Tebak Ibukota Dunia</h3><p>Lihat bendera dan letak peta, lalu ketik nama ibukota negaranya secepat mungkin!</p><button class="btn-aksi" onclick="bukaModal('Tebak Ibukota', '🗺️', 'game')">🎮 Mulai Main</button></div>
+            <div class="kartu-item hidden" data-kategori="game"><div class="ikon-item anim-wiggle">🔠</div><span class="badge badge-game">Bahasa</span><h3>Susun Kata Acak</h3><p>Rapikan huruf-huruf yang berantakan menjadi kata benda dalam Bahasa Inggris.</p><button class="btn-aksi" onclick="bukaModal('Susun Kata', '🔠', 'game')">🎮 Mulai Main</button></div>
+            <div class="kartu-item hidden" data-kategori="game"><div class="ikon-item anim-float">⚽</div><span class="badge badge-game">Olahraga</span><h3>Penalti Matematika</h3><p>Jawab perkalian dengan cepat sebelum kiper menepis tendangan penaltimu.</p><button class="btn-aksi" onclick="bukaModal('Penalti Matematika', '⚽', 'game')">🎮 Mulai Main</button></div>
+            <div class="kartu-item hidden" data-kategori="game"><div class="ikon-item anim-wiggle">📜</div><span class="badge badge-game">PKn</span><h3>Kuis UUD 1945</h3><p>Seberapa hafal kamu dengan pasal-pasal penting? Ayo uji di game kuis ini.</p><button class="btn-aksi" onclick="bukaModal('Kuis UUD', '📜', 'game')">🎮 Mulai Main</button></div>
+
+            <div class="kartu-item hidden" data-kategori="podcast"><div class="ikon-item anim-bounce">🎧</div><span class="badge badge-podcast">Sains</span><h3>Kisah Penemu Hebat</h3><p>Dengarkan cerita seru di balik penemuan lampu dan internet. Tinggal play!</p><button class="btn-aksi" onclick="bukaModal('Kisah Penemu', '🎧', 'podcast')">🎧 Dengerin Yuk</button></div>
+            <div class="kartu-item hidden" data-kategori="podcast"><div class="ikon-item anim-bounce">💻</div><span class="badge badge-podcast">Koding & AI</span><h3>Bincang Santai Dunia IT</h3><p>Obrolan asyik bahas masa depan Artificial Intelligence bareng pakar koding.</p><button class="btn-aksi" onclick="bukaModal('Bincang Dunia IT', '💻', 'podcast')">🎧 Dengerin Yuk</button></div>
+            <div class="kartu-item hidden" data-kategori="podcast"><div class="ikon-item anim-bounce">🕊️</div><span class="badge badge-podcast">Agama</span><h3>Kajian Remaja Islam</h3><p>Menghadapi rasa malas belajar dari sudut pandang agama. Adem banget!</p><button class="btn-aksi" onclick="bukaModal('Kajian Remaja', '🕊️', 'podcast')">🎧 Dengerin Yuk</button></div>
+            <div class="kartu-item hidden" data-kategori="podcast"><div class="ikon-item anim-bounce">🦊</div><span class="badge badge-podcast">Bahasa & Sastra</span><h3>Dongeng Fabel Nusantara</h3><p>Si Kancil dan Buaya, diceritakan kembali dengan suara dubber yang epik.</p><button class="btn-aksi" onclick="bukaModal('Dongeng Fabel', '🦊', 'podcast')">🎧 Dengerin Yuk</button></div>
+            <div class="kartu-item hidden" data-kategori="podcast"><div class="ikon-item anim-bounce">🎵</div><span class="badge badge-podcast">Seni</span><h3>Apresiasi Musik Daerah</h3><p>Menyelami makna tersembunyi dari lagu-lagu daerah Indonesia.</p><button class="btn-aksi" onclick="bukaModal('Musik Daerah', '🎵', 'podcast')">🎧 Dengerin Yuk</button></div>
+            <div class="kartu-item hidden" data-kategori="podcast"><div class="ikon-item anim-bounce">🌌</div><span class="badge badge-podcast">IPA</span><h3>Obrolan Astronomi</h3><p>Ada apa di luar angkasa? Apakah alien itu nyata? Bahas sainsnya di sini.</p><button class="btn-aksi" onclick="bukaModal('Obrolan Astronomi', '🌌', 'podcast')">🎧 Dengerin Yuk</button></div>
+            <div class="kartu-item hidden" data-kategori="podcast"><div class="ikon-item anim-bounce">💼</div><span class="badge badge-podcast">IPS</span><h3>Kisah Pengusaha Muda</h3><p>Inspirasi dari remaja usia SMP yang sudah sukses merintis bisnis online.</p><button class="btn-aksi" onclick="bukaModal('Pengusaha Muda', '💼', 'podcast')">🎧 Dengerin Yuk</button></div>
+            <div class="kartu-item hidden" data-kategori="podcast"><div class="ikon-item anim-bounce">🥇</div><span class="badge badge-podcast">Olahraga</span><h3>Mental Juara Atlet</h3><p>Rahasia ketahanan mental para atlet peraih medali emas Olimpiade.</p><button class="btn-aksi" onclick="bukaModal('Mental Juara', '🥇', 'podcast')">🎧 Dengerin Yuk</button></div>
+            <div class="kartu-item hidden" data-kategori="podcast"><div class="ikon-item anim-bounce">🧠</div><span class="badge badge-podcast">Bimbingan Konseling</span><h3>Curhat Anak Sekolah</h3><p>Tips mengatasi rasa cemas saat ujian dan cara membagi waktu main & belajar.</p><button class="btn-aksi" onclick="bukaModal('Curhat Anak Sekolah', '🧠', 'podcast')">🎧 Dengerin Yuk</button></div>
+            <div class="kartu-item hidden" data-kategori="podcast"><div class="ikon-item anim-bounce">🏛️</div><span class="badge badge-podcast">Sejarah</span><h3>Misteri Candi Borobudur</h3><p>Sejarah tak terungkap di balik pembuatan candi Buddha terbesar di dunia.</p><button class="btn-aksi" onclick="bukaModal('Misteri Borobudur', '🏛️', 'podcast')">🎧 Dengerin Yuk</button></div>
+
+            <div class="kartu-item hidden" data-kategori="komik"><div class="ikon-item anim-splash">🩸</div><span class="badge badge-komik">IPA</span><h3>Petualangan Sel Darah</h3><p>Ikuti perjalanan seru si Merah mengantarkan oksigen ke seluruh tubuh kita.</p><button class="btn-aksi" onclick="bukaModal('Sel Darah Merah', '🩸', 'komik')">🖼️ Baca Komik</button></div>
+            <div class="kartu-item hidden" data-kategori="komik"><div class="ikon-item anim-splash">🤖</div><span class="badge badge-komik">Koding</span><h3>Kisah Si Robot AI</h3><p>Komik seru tentang robot kecil yang belajar memahami perasaan manusia.</p><button class="btn-aksi" onclick="bukaModal('Si Robot AI', '🤖', 'komik')">🖼️ Baca Komik</button></div>
+            <div class="kartu-item hidden" data-kategori="komik"><div class="ikon-item anim-splash">🦸‍♂️</div><span class="badge badge-komik">Sejarah</span><h3>Pahlawan Kemerdekaan</h3><p>Komik aksi pertempuran 10 November Surabaya yang menegangkan.</p><button class="btn-aksi" onclick="bukaModal('Pahlawan Kemerdekaan', '🦸‍♂️', 'komik')">🖼️ Baca Komik</button></div>
+            <div class="kartu-item hidden" data-kategori="komik"><div class="ikon-item anim-splash">🤝</div><span class="badge badge-komik">Agama</span><h3>Adab Berteman</h3><p>Komik lucu tentang keseharian anak sekolah yang saling menghargai berdasar agama.</p><button class="btn-aksi" onclick="bukaModal('Adab Berteman', '🤝', 'komik')">🖼️ Baca Komik</button></div>
+            <div class="kartu-item hidden" data-kategori="komik"><div class="ikon-item anim-splash">🎨</div><span class="badge badge-komik">Seni</span><h3>Warna-Warni Nusantara</h3><p>Petualangan mengumpulkan corak batik dari seluruh penjuru Indonesia.</p><button class="btn-aksi" onclick="bukaModal('Warna Nusantara', '🎨', 'komik')">🖼️ Baca Komik</button></div>
+            <div class="kartu-item hidden" data-kategori="komik"><div class="ikon-item anim-splash">👽</div><span class="badge badge-komik">IPA</span><h3>Terdampar di Mars</h3><p>Komik fiksi sains tentang bertahan hidup di planet merah menggunakan ilmu fisika.</p><button class="btn-aksi" onclick="bukaModal('Terdampar di Mars', '👽', 'komik')">🖼️ Baca Komik</button></div>
+            <div class="kartu-item hidden" data-kategori="komik"><div class="ikon-item anim-splash">⛵</div><span class="badge badge-komik">IPS</span><h3>Jalur Rempah Kuno</h3><p>Melihat kesibukan pelabuhan Nusantara zaman dulu lewat ilustrasi indah.</p><button class="btn-aksi" onclick="bukaModal('Jalur Rempah', '⛵', 'komik')">🖼️ Baca Komik</button></div>
+            <div class="kartu-item hidden" data-kategori="komik"><div class="ikon-item anim-splash">🔢</div><span class="badge badge-komik">Matematika</span><h3>Detektif Angka</h3><p>Membantu detektif polisi memecahkan kasus sandi brankas dengan ilmu matematika.</p><button class="btn-aksi" onclick="bukaModal('Detektif Angka', '🔢', 'komik')">🖼️ Baca Komik</button></div>
+            <div class="kartu-item hidden" data-kategori="komik"><div class="ikon-item anim-splash">📖</div><span class="badge badge-komik">Bahasa</span><h3>Misteri Tanda Baca</h3><p>Komik komedi ketika koma dan titik kabur dari sebuah buku cerita.</p><button class="btn-aksi" onclick="bukaModal('Misteri Tanda Baca', '📖', 'komik')">🖼️ Baca Komik</button></div>
+            <div class="kartu-item hidden" data-kategori="komik"><div class="ikon-item anim-splash">🏸</div><span class="badge badge-komik">Olahraga</span><h3>Smash Emas</h3><p>Perjalanan seorang anak desa yang bercita-cita menjadi juara bulutangkis dunia.</p><button class="btn-aksi" onclick="bukaModal('Smash Emas', '🏸', 'komik')">🖼️ Baca Komik</button></div>
+
+            <div id="pesan-kosong" class="pesan-kosong d-none">
+                <div class="ikon-kosong">🕵️‍♂️</div>
+                <h3>Waduh, belum ketemu nih!</h3>
+                <p>Yang kamu cari saat ini belum muncul, tunggu update terbaru yaa...</p>
+            </div>
+
+        </section>
+
+        <footer class="footer-animasi">
+            <p>dev: Salim Ubaidillah <span class="lampu-nyala">💡</span><br> <b>Koding dan Kecerdasan Artifisial</b></p>
+        </footer>
+
+        <div id="item-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="tutupModal()">&times;</span>
+                <div id="modal-icon" class="modal-ikon anim-pulse">✨</div>
+                <h2 id="modal-judul">Judul</h2>
+                <p id="modal-deskripsi">Mempersiapkan pengalaman seru untukmu...</p>
+                <button id="btn-modal-aksi" class="btn-mulai" style="margin-top: 15px;" onclick="tutupModal()">Lanjut</button>
+            </div>
+        </div>
+    </div> <script src="script.js"></script>
+</body>
+</html>
